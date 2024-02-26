@@ -139,7 +139,6 @@ class BarangService extends AbstractService
 			);
 
 			if (false !== $barang) {		
-				//exo		
 				return $barang->toArray();
 			}
 			else {
