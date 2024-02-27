@@ -5,6 +5,7 @@ use MyApp\Controllers\UsersController;
 use MyApp\Controllers\TokensController;
 use MyApp\Controllers\BarangController;
 use MyApp\Controllers\PropinsiController;
+use MyApp\Controllers\KabupatenController;
 
 $path = $app->request->getURI(true);
 $parts = explode("/", $path);
@@ -65,6 +66,21 @@ switch ($collection) {
             ;
 
         $app->mount($propinsiCollection);
+
+        break;
+    case 'kabupaten':
+        $kabupatenCollection = new MicroCollection();
+
+        $kabupatenCollection
+            ->setHandler(KabupatenController::class, true)
+            ->setPrefix('/api/kabupaten')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($kabupatenCollection);
 
         break;
     default:

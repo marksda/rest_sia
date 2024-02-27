@@ -7,6 +7,7 @@ use MyApp\Services\UsersService;
 use MyApp\Services\TokensService;
 use MyApp\Services\BarangService;
 use MyApp\Services\PropinsiService;
+use MyApp\Services\KabupatenService;
 
 
 $di = new FactoryDefault();
@@ -52,6 +53,11 @@ $di->setShared(
 $di->setShared(
     'propinsiService',
     PropinsiService::class
+);
+
+$di->setShared(
+    'kabupatenService',
+    KabupatenService::class
 );
 
 return $di;

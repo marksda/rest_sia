@@ -59,7 +59,7 @@ class BarangService extends AbstractService
 			if($barangIdLama != $barangDataBaru->id) {
 				$sql     = "
 				UPDATE 
-					public.barang
+					public.tbl_barang
 				SET 
 					id = :idBaru, 
 					nama = :nama

@@ -18,7 +18,7 @@ class Barang extends Model
     public function initialize()
     {
         $this->setSchema("public");
-        $this->setSource("barang");
+        $this->setSource("tbl_barang");
     }
 
     /**

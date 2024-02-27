@@ -15,7 +15,7 @@ class Kabupaten extends Model
     public function initialize()
     {
         $this->setSchema("public");
-        $this->setSource("kabupaten");
+        $this->setSource("tbl_kabupaten");
     }
 
     /**
