@@ -15,7 +15,7 @@ class Kecamatan extends Model
     public function initialize()
     {
         $this->setSchema("public");
-        $this->setSource("kecamatan");
+        $this->setSource("tbl_kecamatan");
     }
 
     /**

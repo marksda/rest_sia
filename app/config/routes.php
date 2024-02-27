@@ -6,6 +6,7 @@ use MyApp\Controllers\TokensController;
 use MyApp\Controllers\BarangController;
 use MyApp\Controllers\PropinsiController;
 use MyApp\Controllers\KabupatenController;
+use MyApp\Controllers\KecamatanController;
 
 $path = $app->request->getURI(true);
 $parts = explode("/", $path);
@@ -81,6 +82,21 @@ switch ($collection) {
             ;
 
         $app->mount($kabupatenCollection);
+
+        break;
+    case 'kecamatan':
+        $kecamatanCollection = new MicroCollection();
+
+        $kecamatanCollection
+            ->setHandler(KecamatanController::class, true)
+            ->setPrefix('/api/kecamatan')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($kecamatanCollection);
 
         break;
     default:

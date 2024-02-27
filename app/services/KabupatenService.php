@@ -18,6 +18,7 @@ class KabupatenService extends AbstractService
 			$kabupaten   = new Kabupaten();
 			$result = $kabupaten->setId($data->id)
                             ->setNama($data->nama)
+							->setPropinsi($data->propinsi)
                             ->create();
 
 			if (false === $result) {
@@ -62,7 +63,8 @@ class KabupatenService extends AbstractService
 					public.tbl_kabupaten
 				SET 
 					id = :idBaru, 
-					nama = :nama
+					nama = :nama,
+					propinsi = :idPropinsi
 				WHERE
 					id = :idLama
 				";
@@ -72,7 +74,8 @@ class KabupatenService extends AbstractService
 					[
 						'idBaru' => $dataBaru->id,
 						'nama' => $dataBaru->nama,
-						'idLama' => $idLama,
+						'propinsi' => $dataBaru->propinsi,
+						'idLama' => $idLama
 					]
 				);
 
@@ -82,6 +85,7 @@ class KabupatenService extends AbstractService
 			}
 			else {
 				$kabupaten->setNama($dataBaru->nama);
+				$kabupaten->setPropinsi($dataBaru->propinsi);
 				$result = $kabupaten->update();
 
 				if ( false === $result) {
