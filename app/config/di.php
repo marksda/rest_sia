@@ -6,6 +6,7 @@ use Phalcon\Db\Adapter\Pdo\Postgresql;
 use MyApp\Services\UsersService;
 use MyApp\Services\TokensService;
 use MyApp\Services\BarangService;
+use MyApp\Services\PropinsiService;
 
 
 $di = new FactoryDefault();
@@ -46,6 +47,11 @@ $di->setShared(
 $di->setShared(
     'barangService',
     BarangService::class
+);
+
+$di->setShared(
+    'propinsiService',
+    PropinsiService::class
 );
 
 return $di;

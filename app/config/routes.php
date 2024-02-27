@@ -4,6 +4,7 @@ use Phalcon\Mvc\Micro\Collection as MicroCollection;
 use MyApp\Controllers\UsersController;
 use MyApp\Controllers\TokensController;
 use MyApp\Controllers\BarangController;
+use MyApp\Controllers\PropinsiController;
 
 $path = $app->request->getURI(true);
 $parts = explode("/", $path);
@@ -49,6 +50,21 @@ switch ($collection) {
             ;
 
         $app->mount($barangCollection);
+
+        break;
+    case 'propinsi':
+        $propinsiCollection = new MicroCollection();
+
+        $propinsiCollection
+            ->setHandler(PropinsiController::class, true)
+            ->setPrefix('/api/propinsi')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($propinsiCollection);
 
         break;
     default:

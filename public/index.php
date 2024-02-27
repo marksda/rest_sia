@@ -1,7 +1,6 @@
 <?php
 
 use Phalcon\Mvc\Micro;
-// use Phalcon\Autoload\Loader;
 use MyApp\Controllers\AbstractHttpException;
 use Phalcon\Http\Request\Exception as PhalconException;
 
