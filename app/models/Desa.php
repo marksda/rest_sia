@@ -15,7 +15,7 @@ class Desa extends Model
     public function initialize()
     {
         $this->setSchema("public");
-        $this->setSource("desa");
+        $this->setSource("tbl_desa");
     }
 
     /**

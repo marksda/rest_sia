@@ -18,6 +18,7 @@ class KecamatanService extends AbstractService
 			$kecamatan   = new Kecamatan();
 			$result = $kecamatan->setId($data->id)
                             ->setNama($data->nama)
+							->setKabupaten($data->kabupaten)
                             ->create();
 
 			if (false === $result) {

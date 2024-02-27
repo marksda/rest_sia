@@ -7,6 +7,7 @@ use MyApp\Controllers\BarangController;
 use MyApp\Controllers\PropinsiController;
 use MyApp\Controllers\KabupatenController;
 use MyApp\Controllers\KecamatanController;
+use MyApp\Controllers\DesaController;
 
 $path = $app->request->getURI(true);
 $parts = explode("/", $path);
@@ -97,6 +98,21 @@ switch ($collection) {
             ;
 
         $app->mount($kecamatanCollection);
+
+        break;
+    case 'desa':
+        $desaCollection = new MicroCollection();
+
+        $desaCollection
+            ->setHandler(DesaController::class, true)
+            ->setPrefix('/api/desa')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($desaCollection);
 
         break;
     default:
