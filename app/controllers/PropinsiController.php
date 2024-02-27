@@ -8,7 +8,7 @@ use MyApp\Services\AbstractService;
 use MyApp\Controllers\HttpExceptions\Http422Exception;
 use MyApp\Controllers\HttpExceptions\Http500Exception;
 
-class BarangController extends Controller
+class PropinsiController extends Controller
 {
 
     /**

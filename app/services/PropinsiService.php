@@ -16,7 +16,7 @@ class PropinsiService extends AbstractService
 	{
 		try {
 			$propinsi   = new Propinsi();
-			$result = $barang->setId($data->id)
+			$result = $propinsi->setId($data->id)
                             ->setNama($data->nama)
                             ->create();
 
@@ -59,7 +59,7 @@ class PropinsiService extends AbstractService
 			if($idLama != $dataBaru->id) {
 				$sql     = "
 				UPDATE 
-					public.propinsi
+					public.tbl_propinsi
 				SET 
 					id = :idBaru, 
 					nama = :nama

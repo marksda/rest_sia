@@ -14,7 +14,7 @@ class Propinsi extends Model
     public function initialize()
     {
         $this->setSchema("public");
-        $this->setSource("propinsi");
+        $this->setSource("tbl_propinsi");
     }
 
     /**
