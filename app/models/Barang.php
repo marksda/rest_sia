@@ -14,6 +14,7 @@ class Barang extends Model
      */
     protected $id; 
     protected $nama; 
+    protected $harga_satuan;
 
     public function initialize()
     {
@@ -61,4 +62,23 @@ class Barang extends Model
         return $this;
     }
 
+    /**
+     * Get the value of harga_satuan
+     */ 
+    public function getHarga_satuan()
+    {
+        return $this->harga_satuan;
+    }
+
+    /**
+     * Set the value of harga_satuan
+     *
+     * @return  self
+     */ 
+    public function setHarga_satuan($harga_satuan)
+    {
+        $this->harga_satuan = $harga_satuan;
+
+        return $this;
+    }
 }

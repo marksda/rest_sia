@@ -18,6 +18,7 @@ class BarangService extends AbstractService
 			$barang   = new Barang();
 			$result = $barang->setId($barangData->id)
                             ->setNama($barangData->nama)
+							->setHarga_satuan($barangData->hargaSatuan)
                             ->create();
 
 			if (false === $result) {
@@ -63,6 +64,7 @@ class BarangService extends AbstractService
 				SET 
 					id = :idBaru, 
 					nama = :nama
+					harga_satuan = :hargaSatuan
 				WHERE
 					id = :idLama
 				";
@@ -72,7 +74,8 @@ class BarangService extends AbstractService
 					[
 						'idBaru' => $barangDataBaru->id,
 						'nama' => $barangDataBaru->nama,
-						'idLama' => $barangIdLama,
+						'hargaSatuan' => $barangDataBaru->harga_satuan,
+						'idLama' => $barangIdLama
 					]
 				);
 
@@ -82,6 +85,7 @@ class BarangService extends AbstractService
 			}
 			else {
 				$barang->setNama($barangDataBaru->nama);
+				$barang->setHarga_satuan($barangDataBaru->harga_satuan);
 				$result = $barang->update();
 
 				if ( false === $result) {
@@ -134,7 +138,7 @@ class BarangService extends AbstractService
 				[
 					'conditions' => '',
 					'bind'       => [],
-					'columns'    => "id, nama",
+					'columns'    => "id, nama, harga_satuan",
 				]
 			);
 
