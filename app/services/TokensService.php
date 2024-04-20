@@ -14,7 +14,7 @@ class TokensService extends AbstractService
     {        
         $sql = "
             SELECT 
-                id, nama, pass
+                id, nama, pass,
             FROM
                 public.users
             WHERE 
