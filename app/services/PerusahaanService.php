@@ -93,14 +93,15 @@ class PerusahaanService extends AbstractService
 						'idBaru' => $perusahaanDataBaru->id,
 						'nama' => $perusahaanDataBaru->nama,
                         'npwp' => $perusahaanDataBaru->npwp,
-						'propinsi' => $perusahaanDataBaru->propinsi,
-						'kabupaten' => $perusahaanDataBaru->kabupaten,
-                        'kecamatan' => $perusahaanDataBaru->kecamatan,
-                        'desa' => $perusahaanDataBaru->desa,
+						'propinsi' => $perusahaanDataBaru->propinsi->id,
+						'kabupaten' => $perusahaanDataBaru->kabupaten->id,
+                        'kecamatan' => $perusahaanDataBaru->kecamatan->id,
+                        'desa' => $perusahaanDataBaru->desa->id,
                         'detail_alamat' => $perusahaanDataBaru->detail_alamat,
                         'telepone' => $perusahaanDataBaru->telepone,
                         'email' => $perusahaanDataBaru->email,
-                        'tanggal_registrasi' => $perusahaanDataBaru->tanggal_registrasi
+                        'tanggal_registrasi' => $perusahaanDataBaru->tanggal_registrasi,
+						'idLama' => $perusahaanIdLama
 					]
 				);
 
@@ -111,10 +112,10 @@ class PerusahaanService extends AbstractService
 			else {
 				$perusahaan->setNama($perusahaanData->nama);
                 $perusahaan->setNpwp($perusahaanDataBaru->npwp);
-                $perusahaan->setPropinsi($perusahaanDataBaru->propinsi);
-                $perusahaan->setKabupaten($perusahaanDataBaru->kabupaten);
-                $perusahaan->setKecamatan($perusahaanDataBaru->kecamatan);
-                $perusahaan->setDesa($perusahaanDataBaru->desa);
+                $perusahaan->setPropinsi($perusahaanDataBaru->propinsi->id);
+                $perusahaan->setKabupaten($perusahaanDataBaru->kabupaten->id);
+                $perusahaan->setKecamatan($perusahaanDataBaru->kecamatan->id);
+                $perusahaan->setDesa($perusahaanDataBaru->desa->id);
                 $perusahaan->setDetail_alamat($perusahaanDataBaru->detail_alamat);
                 $perusahaan->setTelepone($perusahaanDataBaru->telepone);
                 $perusahaan->setEmail($perusahaanDataBaru->email);
@@ -167,23 +168,31 @@ class PerusahaanService extends AbstractService
     public function getPerusahaanList()
     {
         try {
-			$perusahaan = Perusahaan::find(
+			$daftarPerusahaan = Perusahaan::find(
 				[
 					'conditions' => '',
 					'bind'       => [],
-					'columns'    => "id, nama, npwp, kabupaten, kecamatan, desa, detail_alamat, telepone, email, tanggal_registrasi",
+					// 'columns'    => "id, nama, npwp, kabupaten, kecamatan, desa, detail_alamat, telepone, email, tanggal_registrasi",
 				]
 			);
 
-			if (!$perusahaan) {
+			if (!$daftarPerusahaan) {
 				return [];
 			}
 
-            foreach ($perusahaan->getDetailPropinsi() as $detailPropinsi) {
-                $perusahaan->setPropinsi($detailPropinsi);
+			$i = 0;
+			$hasil = array();
+            foreach ($daftarPerusahaan as $perusahaan) {
+				// $detailPropinsi = $perusahaan->getRelated('detail_propinsi');
+                $perusahaan->setPropinsi($perusahaan->getRelated('detail_propinsi'));
+				$perusahaan->setKabupaten($perusahaan->getRelated('detail_kabupaten'));
+				$perusahaan->setKecamatan($perusahaan->getRelated('detail_kecamatan'));
+				$perusahaan->setDesa($perusahaan->getRelated('detail_desa'));
+				$hasil[$i] = $perusahaan;
+				$i++;
             }
 
-			return $perusahaan->toArray();
+			return $hasil; 
 		} catch (PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}

@@ -3,7 +3,10 @@
 namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
-use Phalcon\Mvc\Model\ResultsetInterface;
+use MyApp\Models\Propinsi;
+use MyApp\Models\Kabupaten;
+use MyApp\Models\Kecamatan;
+use MyApp\Models\Desa;
 
 class Perusahaan extends Model
 {
@@ -30,7 +33,35 @@ class Perusahaan extends Model
             Propinsi::class,
             'id',
             [
-                'alias'    => 'detailPropinsi'
+                'reusable' => true,
+                'alias'    => 'detail_propinsi'
+            ]
+        );
+        $this->hasOne(
+            'kabupaten',
+            Kabupaten::class,
+            'id',
+            [
+                'reusable' => true,
+                'alias'    => 'detail_kabupaten'
+            ]
+        );
+        $this->hasOne(
+            'kecamatan',
+            Kecamatan::class,
+            'id',
+            [
+                'reusable' => true,
+                'alias'    => 'detail_kecamatan'
+            ]
+        );
+        $this->hasOne(
+            'desa',
+            Desa::class,
+            'id',
+            [
+                'reusable' => true,
+                'alias'    => 'detail_desa'
             ]
         );
     }
