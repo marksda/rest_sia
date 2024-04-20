@@ -63,7 +63,7 @@ class BarangService extends AbstractService
 					public.tbl_barang
 				SET 
 					id = :idBaru, 
-					nama = :nama
+					nama = :nama,
 					harga_satuan = :hargaSatuan
 				WHERE
 					id = :idLama

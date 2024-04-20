@@ -8,6 +8,7 @@ use MyApp\Controllers\PropinsiController;
 use MyApp\Controllers\KabupatenController;
 use MyApp\Controllers\KecamatanController;
 use MyApp\Controllers\DesaController;
+use MyApp\Controllers\PerusahaanController;
 
 $path = $app->request->getURI(true);
 $parts = explode("/", $path);
@@ -113,6 +114,21 @@ switch ($collection) {
             ;
 
         $app->mount($desaCollection);
+
+        break;
+    case 'perusahaan':
+        $perusahaanCollection = new MicroCollection();
+
+        $perusahaanCollection
+            ->setHandler(PerusahaanController::class, true)
+            ->setPrefix('/api/perusahaan')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{perusahaanIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{perusahaanId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($perusahaanCollection);
 
         break;
     default:

@@ -8,17 +8,18 @@ use MyApp\Services\AbstractService;
 use MyApp\Controllers\HttpExceptions\Http422Exception;
 use MyApp\Controllers\HttpExceptions\Http500Exception;
 
-class BarangController extends Controller
+class PerusahaanController extends Controller
 {
+
     /**
-	 * Adding barang
+	 * Adding perusahaan
 	 */
     public function addAction()
     {
         $data = $this->request->getJsonRawBody();
         
         try {
-            $this->barangService->createBarang($data);
+            $this->perusahaanService->createPerusahaan($data);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_ALREADY_EXISTS:
@@ -31,16 +32,16 @@ class BarangController extends Controller
     }
 
     /**
-     * Updating existing barang
+     * Updating existing perusahaan
      *
-     * @param string $barangIdLama
+     * @param string $perusahaanIdLama
      */
-    public function updateAction($barangIdLama)
+    public function updateAction($perusahaanIdLama)
     {
         $data = $this->request->getJsonRawBody();
         
         try {
-            $this->barangService->updateBarang($barangIdLama, $data);
+            $this->perusahaanService->updatePerusahaan($perusahaanIdLama, $data);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_ALREADY_EXISTS:
@@ -53,14 +54,14 @@ class BarangController extends Controller
     }
 
     /**
-     * Delete an existing barang
+     * Delete an existing perusahaan
      *
-     * @param string $barangId
+     * @param string $perusahaanId
      */
-    public function deleteAction($barangId)
+    public function deleteAction($perusahaanId)
     {
         try {
-            $this->barangService->deleteBarang($barangId);
+            $this->perusahaanService->deletePerusahaan($perusahaanId);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_UNABLE_DELETE_ITEM:
@@ -73,19 +74,19 @@ class BarangController extends Controller
     }
 
     /**
-     * Returns barang list
+     * Returns perusahaan list
      *
      * @return array
      */
     public function listAction()
     {
         try {
-            $barangList = $this->barangService->getBarangList();
+            $perusahaanList = $this->perusahaanService->getPerusahaanList();
         } catch (ServiceException $e) {
             throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
         }
 
-        return $barangList;
+        return $perusahaanList;
     }
 
 }

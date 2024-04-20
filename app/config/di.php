@@ -10,6 +10,7 @@ use MyApp\Services\PropinsiService;
 use MyApp\Services\KabupatenService;
 use MyApp\Services\KecamatanService;
 use MyApp\Services\DesaService;
+use MyApp\Services\PerusahaanService;
 
 
 $di = new FactoryDefault();
@@ -70,6 +71,11 @@ $di->setShared(
 $di->setShared(
     'desaService',
     DesaService::class
+);
+
+$di->setShared(
+    'perusahaanService',
+    PerusahaanService::class
 );
 
 return $di;
