@@ -24,7 +24,7 @@ class Perusahaan extends Model
     public function initialize()
     {
         $this->setSchema("public");
-        $this->setSource('barang');
+        $this->setSource("tbl_perusahaan");
     }
 
     /**
