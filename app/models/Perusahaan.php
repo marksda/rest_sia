@@ -25,6 +25,14 @@ class Perusahaan extends Model
     {
         $this->setSchema("public");
         $this->setSource("tbl_perusahaan");
+        $this->hasOne(
+            'propinsi',
+            Propinsi::class,
+            'id',
+            [
+                'alias'    => 'detailPropinsi'
+            ]
+        );
     }
 
     /**

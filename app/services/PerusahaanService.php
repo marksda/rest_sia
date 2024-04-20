@@ -6,7 +6,7 @@ use MyApp\Models\Perusahaan;
 use Phalcon\Encryption\Security\Random;
 
 
-class UsersService extends AbstractService
+class PerusahaanService extends AbstractService
 {
 
     /**
@@ -159,6 +159,11 @@ class UsersService extends AbstractService
 		}
 	}
 
+    /**
+	 * Returns perusahaan list
+	 *
+	 * @return array
+	 */
     public function getPerusahaanList()
     {
         try {
@@ -166,13 +171,17 @@ class UsersService extends AbstractService
 				[
 					'conditions' => '',
 					'bind'       => [],
-					'columns'    => "id, nama, npwp, propinsi, kabupaten",
+					'columns'    => "id, nama, npwp, kabupaten, kecamatan, desa, detail_alamat, telepone, email, tanggal_registrasi",
 				]
 			);
 
 			if (!$perusahaan) {
 				return [];
 			}
+
+            foreach ($perusahaan->getDetailPropinsi() as $detailPropinsi) {
+                $perusahaan->setPropinsi($detailPropinsi);
+            }
 
 			return $perusahaan->toArray();
 		} catch (PDOException $e) {
