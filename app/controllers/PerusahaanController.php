@@ -67,6 +67,8 @@ class PerusahaanController extends Controller
                 case AbstractService::ERROR_UNABLE_DELETE_ITEM:
                 case AbstractService::ERROR_ITEM_NOT_FOUND:
                     throw new Http422Exception($e->getMessage(), $e->getCode(), $e);
+                case AbstractService::ERROR_FOREIGN_KEY_VIOLATION:
+                    throw new Http422Exception($e->getMessage(), $e->getCode(), $e);    
                 default:
                     throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
             }

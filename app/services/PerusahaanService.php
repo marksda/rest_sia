@@ -22,10 +22,10 @@ class PerusahaanService extends AbstractService
             $result = $perusahaan->setId($random->base58(12))
 			               ->setNama($perusahaanData->nama)
                            ->setNpwp($perusahaanData->npwp)
-                           ->setPropinsi($perusahaanData->propinsi)
-                           ->setKabupaten($perusahaanData->kabupaten)
-                           ->setKecamatan($perusahaanData->kecamatan)
-                           ->setDesa($perusahaanData->desa)
+                           ->setPropinsi($perusahaanData->propinsi->id)
+                           ->setKabupaten($perusahaanData->kabupaten->id)
+                           ->setKecamatan($perusahaanData->kecamatan->id)
+                           ->setDesa($perusahaanData->desa->id)
                            ->setDetail_alamat($perusahaanData->detail_alamat)
                            ->setTelepone($perusahaanData->telepone)
                            ->setEmail($perusahaanData->email)
@@ -110,7 +110,7 @@ class PerusahaanService extends AbstractService
 				}
 			}
 			else {
-				$perusahaan->setNama($perusahaanData->nama);
+				$perusahaan->setNama($perusahaanDataBaru->nama);
                 $perusahaan->setNpwp($perusahaanDataBaru->npwp);
                 $perusahaan->setPropinsi($perusahaanDataBaru->propinsi->id);
                 $perusahaan->setKabupaten($perusahaanDataBaru->kabupaten->id);

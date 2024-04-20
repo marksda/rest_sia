@@ -21,4 +21,6 @@ abstract class AbstractService extends Injectable
 
     const ERROR_UNABLE_DELETE_ITEM = 1105;
 
+    const ERROR_FOREIGN_KEY_VIOLATION = 23503;
+
 }
