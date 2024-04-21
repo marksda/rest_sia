@@ -183,7 +183,6 @@ class PerusahaanService extends AbstractService
 			$i = 0;
 			$hasil = array();
             foreach ($daftarPerusahaan as $perusahaan) {
-				// $detailPropinsi = $perusahaan->getRelated('detail_propinsi');
                 $perusahaan->setPropinsi($perusahaan->getRelated('detail_propinsi'));
 				$perusahaan->setKabupaten($perusahaan->getRelated('detail_kabupaten'));
 				$perusahaan->setKecamatan($perusahaan->getRelated('detail_kecamatan'));

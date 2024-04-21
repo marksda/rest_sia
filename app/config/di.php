@@ -11,6 +11,7 @@ use MyApp\Services\KabupatenService;
 use MyApp\Services\KecamatanService;
 use MyApp\Services\DesaService;
 use MyApp\Services\PerusahaanService;
+use MyApp\Services\OfficeStoreOutletService;
 
 
 $di = new FactoryDefault();
@@ -76,6 +77,11 @@ $di->setShared(
 $di->setShared(
     'perusahaanService',
     PerusahaanService::class
+);
+
+$di->setShared(
+    'officeStoreOutletService',
+    OfficeStoreOutletService::class
 );
 
 return $di;

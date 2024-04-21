@@ -9,6 +9,7 @@ use MyApp\Controllers\KabupatenController;
 use MyApp\Controllers\KecamatanController;
 use MyApp\Controllers\DesaController;
 use MyApp\Controllers\PerusahaanController;
+use MyApp\Controllers\OfficeStoreOutletController;
 
 $path = $app->request->getURI(true);
 $parts = explode("/", $path);
@@ -131,6 +132,21 @@ switch ($collection) {
         $app->mount($perusahaanCollection);
 
         break;
+    case 'office':
+            $officeCollection = new MicroCollection();
+    
+            $officeCollection
+                ->setHandler(OfficeStoreOutletController::class, true)
+                ->setPrefix('/api/office')
+                ->get('/list', 'listAction')
+                ->post('/add', 'addAction')
+                ->put('/{officeIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+                ->delete('/{officeId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+                ;
+    
+            $app->mount($officeCollection);
+    
+            break;
     default:
         // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
         break;
