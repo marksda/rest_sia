@@ -110,9 +110,9 @@ class OfficeStoreOutletService extends AbstractService
                 $office->setKecamatan($officeDataBaru->kecamatan->id);
                 $office->setDesa($officeDataBaru->desa->id);
                 $office->setDetail_alamat($officeDataBaru->detail_alamat);                
-                $office->setPerusahaan($officeDataBaru->npwp);
+                $office->setPerusahaan($officeDataBaru->perusahaan->id);
                 $office->setTelepone($officeDataBaru->telepone);
-				$result = $perusahaan->update();
+				$result = $office->update();
 
 				if ( false === $result) {
 					throw new ServiceException('Unable to update office', self::ERROR_UNABLE_UPDATE_ITEM);
@@ -178,7 +178,14 @@ class OfficeStoreOutletService extends AbstractService
 				$office->setKabupaten($office->getRelated('detail_kabupaten'));
 				$office->setKecamatan($office->getRelated('detail_kecamatan'));
 				$office->setDesa($office->getRelated('detail_desa'));
-                $office->setPerusahaan($office->getRelated('detail_perusahaan'));
+
+                $perusahaan = $office->getRelated('detail_perusahaan');
+                $perusahaan->setPropinsi($perusahaan->getRelated('detail_propinsi'));
+				$perusahaan->setKabupaten($perusahaan->getRelated('detail_kabupaten'));
+				$perusahaan->setKecamatan($perusahaan->getRelated('detail_kecamatan'));
+				$perusahaan->setDesa($perusahaan->getRelated('detail_desa'));
+
+                $office->setPerusahaan($perusahaan);
 				$hasil[$i] = $office;
 				$i++;
             }
