@@ -10,6 +10,7 @@ use MyApp\Controllers\KecamatanController;
 use MyApp\Controllers\DesaController;
 use MyApp\Controllers\PerusahaanController;
 use MyApp\Controllers\OfficeStoreOutletController;
+use MyApp\Controllers\JenisJurnalController;
 
 $path = $app->request->getURI(true);
 $parts = explode("/", $path);
@@ -147,6 +148,21 @@ switch ($collection) {
             $app->mount($officeCollection);
     
             break;
+    case 'jenis_jurnal':
+        $jenisJurnalCollection = new MicroCollection();
+
+        $jenisJurnalCollection
+            ->setHandler(JenisJurnalController::class, true)
+            ->setPrefix('/api/jenis_jurnal')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{jenisJurnalIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{jenisJurnalId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($jenisJurnalCollection);
+
+        break;        
     default:
         // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
         break;
