@@ -86,7 +86,7 @@ class JenisJurnalService extends AbstractService
 			else {
 				$jenisJurnal->setNama($jenisJurnalDataBaru->nama);
                 $jenisJurnal->setKeterangan($jenisJurnalDataBaru->keterangan);
-				$result = $office->update();
+				$result = $jenisJurnal->update();
 
 				if ( false === $result) {
 					throw new ServiceException('Unable to update jenis jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
@@ -138,7 +138,7 @@ class JenisJurnalService extends AbstractService
 				[
 					'conditions' => '',
 					'bind'       => [],
-                    'columns'    => "id, nama, keterangan",
+                    'columns'    => "id, nama",
 				]
 			);
 
