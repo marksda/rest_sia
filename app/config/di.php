@@ -14,6 +14,7 @@ use MyApp\Services\PerusahaanService;
 use MyApp\Services\OfficeStoreOutletService;
 use MyApp\Services\JenisJurnalService;
 use MyApp\Services\HakAksesService;
+use MyApp\Services\ModulService;
 
 
 $di = new FactoryDefault();
@@ -94,6 +95,11 @@ $di->setShared(
 $di->setShared(
     'hakAksesService',
     HakAksesService::class
+);
+
+$di->setShared(
+    'modulService',
+    ModulService::class
 );
 
 return $di;

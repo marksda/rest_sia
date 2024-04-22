@@ -12,6 +12,8 @@ use MyApp\Controllers\PerusahaanController;
 use MyApp\Controllers\OfficeStoreOutletController;
 use MyApp\Controllers\JenisJurnalController;
 use MyApp\Controllers\HakAksesController;
+use MyApp\Controllers\ModulController;
+
 
 $path = $app->request->getURI(true);
 $parts = explode("/", $path);
@@ -177,6 +179,21 @@ switch ($collection) {
             ;
 
         $app->mount($hakAksesCollection);
+
+        break;     
+    case 'modul':
+        $modulCollection = new MicroCollection();
+
+        $modulCollection
+            ->setHandler(ModulController::class, true)
+            ->setPrefix('/api/modul')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{jenisJurnalIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{jenisJurnalId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($modulCollection);
 
         break;        
     default:
