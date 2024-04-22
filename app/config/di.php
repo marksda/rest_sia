@@ -13,6 +13,7 @@ use MyApp\Services\DesaService;
 use MyApp\Services\PerusahaanService;
 use MyApp\Services\OfficeStoreOutletService;
 use MyApp\Services\JenisJurnalService;
+use MyApp\Services\HakAksesService;
 
 
 $di = new FactoryDefault();
@@ -88,6 +89,11 @@ $di->setShared(
 $di->setShared(
     'jenisJurnalService',
     JenisJurnalService::class
+);
+
+$di->setShared(
+    'hakAksesService',
+    HakAksesService::class
 );
 
 return $di;
