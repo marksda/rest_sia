@@ -83,7 +83,7 @@ class HakAksesService extends AbstractService
 				}
 			}
 			else {
-				$hakAkses->setNama($HakAksesDataBaru->nama);
+				$hakAkses->setNama($hakAksesDataBaru->nama);
 				$result = $hakAkses->update();
 
 				if ( false === $result) {
