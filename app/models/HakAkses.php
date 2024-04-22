@@ -3,16 +3,27 @@
 namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
+use MyApp\Models\Modul;
 
 class HakAkses extends Model
 {
     protected $id; 
     protected $nama; 
+    protected $modul;
 
     public function initialize()
     {
         $this->setSchema("public");
         $this->setSource("tbl_hak_akses");
+        $this->hasOne(
+            'modul',
+            Modul::class,
+            'id',
+            [
+                'reusable' => true,
+                'alias'    => 'detail_modul'
+            ]
+        );
     } 
 
     /**
@@ -51,6 +62,26 @@ class HakAkses extends Model
     public function setNama($nama)
     {
         $this->nama = $nama;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of modul
+     */ 
+    public function getModul()
+    {
+        return $this->modul;
+    }
+
+    /**
+     * Set the value of modul
+     *
+     * @return  self
+     */ 
+    public function setModul($modul)
+    {
+        $this->modul = $modul;
 
         return $this;
     }

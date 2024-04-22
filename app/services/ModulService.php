@@ -116,7 +116,7 @@ class ModulService extends AbstractService
 				throw new ServiceException('Modul not found', self::ERROR_ITEM_NOT_FOUND);
 			}
 			
-			if (false === $Modul->delete()) {
+			if (false === $modul->delete()) {
 				throw new ServiceException('Unable to delete modul', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 		} catch (\PDOException $e) {

@@ -21,6 +21,7 @@ class HakAksesService extends AbstractService
             $HakAkses = new HakAkses();
             $result = $HakAkses->setId($random->base58(4))
 			               ->setNama($hakAksesData->nama)
+                           ->setModul($hakAksesData->nama)
 			               ->create();
             
 			if (!$result) {
@@ -64,7 +65,8 @@ class HakAksesService extends AbstractService
 					public.tbl_hak_akses
 				SET 
 					id = :idBaru, 
-					nama = :nama
+					nama = :nama,
+                    modul = :modul
 				WHERE
 					id = :idLama
 				";
@@ -74,6 +76,7 @@ class HakAksesService extends AbstractService
 					[
 						'idBaru' => $hakAksesDataBaru->id,
 						'nama' => $hakAksesDataBaru->nama,
+                        'modul' => $hakAksesDataBaru->modul->id,
 						'idLama' => $hakAksesIdLama
 					]
 				);
@@ -84,6 +87,7 @@ class HakAksesService extends AbstractService
 			}
 			else {
 				$hakAkses->setNama($hakAksesDataBaru->nama);
+                $hakAkses->setModul($hakAksesDataBaru->modul->id);
 				$result = $hakAkses->update();
 
 				if ( false === $result) {
@@ -143,7 +147,15 @@ class HakAksesService extends AbstractService
 				return [];
 			}
 
-			return $daftarHakAkses->toArray(); 
+            $i = 0;
+			$hasil = array();
+            foreach ($daftarHakAkses as $hakAkses) {
+                $hakAkses->setModul($hakAkses->getRelated('detail_modul'));
+				$hasil[$i] = $hakAkses;
+				$i++;
+            }
+
+			return $hasil; 
 		} catch (PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
