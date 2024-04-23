@@ -2,7 +2,7 @@
 
 use Phalcon\Mvc\Micro\Collection as MicroCollection;
 use MyApp\Controllers\UserController;
-use MyApp\Controllers\TokensController;
+use MyApp\Controllers\TokenController;
 use MyApp\Controllers\BarangController;
 use MyApp\Controllers\PropinsiController;
 use MyApp\Controllers\KabupatenController;
@@ -33,12 +33,12 @@ switch ($collection) {
         $app->mount($userCollection);
 
         break;
-    case 'tokens':
+    case 'token':
         $userCollection = new MicroCollection();
 
         $userCollection
-            ->setHandler(TokensController::class, true)
-            ->setPrefix('/api/tokens')
+            ->setHandler(TokenController::class, true)
+            ->setPrefix('/api/token')
             ->post('/new', 'newAction')
             ->put('/refresh', 'refreshAction')
             ;

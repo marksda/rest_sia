@@ -7,13 +7,13 @@ use MyApp\Services\ServiceException;
 use MyApp\Controllers\HttpExceptions\Http400Exception;
 use MyApp\Controllers\HttpExceptions\Http500Exception;
 
-class TokensController extends Controller
+class TokenController extends Controller
 {
     public function newAction()
     {
         try {
             $data = $this->request->getJsonRawBody();
-            $hasil = $this->tokensService->createToken($data);
+            $hasil = $this->tokenService->createToken($data);
             
             if(count($hasil) == 0) {
                 throw new Http400Exception(_('Token can not be generated because authentication failure'), 'Token failed');

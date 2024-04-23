@@ -4,7 +4,7 @@ use Phalcon\Di\FactoryDefault;
 use Phalcon\Encryption\Security;
 use Phalcon\Db\Adapter\Pdo\Postgresql;
 use MyApp\Services\UserService;
-use MyApp\Services\TokensService;
+use MyApp\Services\TokenService;
 use MyApp\Services\BarangService;
 use MyApp\Services\PropinsiService;
 use MyApp\Services\KabupatenService;
@@ -48,8 +48,8 @@ $di->setShared(
 );
 
 $di->setShared(
-    'tokensService',
-    TokensService::class
+    'tokenService',
+    TokenService::class
 );
 
 $di->setShared(

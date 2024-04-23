@@ -8,7 +8,7 @@ use Phalcon\Encryption\Security\JWT\Signer\Hmac;
 use Phalcon\Encryption\Security\JWT\Token\Parser;
 use Phalcon\Encryption\Security\JWT\Validator;
 
-class TokensService extends AbstractService
+class TokenService extends AbstractService
 {
     public function createToken($dataCredential)
     {        
