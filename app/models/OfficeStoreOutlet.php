@@ -31,7 +31,7 @@ class OfficeStoreOutlet extends Model
             Propinsi::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_propinsi'
             ]
         );
@@ -40,7 +40,7 @@ class OfficeStoreOutlet extends Model
             Kabupaten::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_kabupaten'
             ]
         );
@@ -49,7 +49,7 @@ class OfficeStoreOutlet extends Model
             Kecamatan::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_kecamatan'
             ]
         );
@@ -58,7 +58,7 @@ class OfficeStoreOutlet extends Model
             Desa::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_desa'
             ]
         );
@@ -67,7 +67,7 @@ class OfficeStoreOutlet extends Model
             Perusahaan::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_perusahaan'
             ]
         );

@@ -25,7 +25,7 @@ class User extends Model
             OfficeStoreOutlet::class,
             ['id', 'perusahaan'],
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_office_store_outlet'
             ]
         );
@@ -34,7 +34,7 @@ class User extends Model
             HakAkses::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_hak_akses'
             ]
         );

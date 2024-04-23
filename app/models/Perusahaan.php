@@ -33,7 +33,7 @@ class Perusahaan extends Model
             Propinsi::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_propinsi'
             ]
         );
@@ -42,7 +42,7 @@ class Perusahaan extends Model
             Kabupaten::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_kabupaten'
             ]
         );
@@ -51,7 +51,7 @@ class Perusahaan extends Model
             Kecamatan::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_kecamatan'
             ]
         );
@@ -60,7 +60,7 @@ class Perusahaan extends Model
             Desa::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_desa'
             ]
         );

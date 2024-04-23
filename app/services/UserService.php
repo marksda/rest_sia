@@ -24,7 +24,7 @@ class UserService extends AbstractService
 			               ->setPass($this->security->hash($userData->pass))
                            ->setLogin($userData->login)
 						   ->setPerusahaan($userData->perusahaan->id)
-						   ->setOffice_store_outlet($userData->office_outlet_store->id)
+						   ->setOffice_store_outlet($userData->office_store_outlet->id)
 						   ->setHak_akses($userData->hak_akses->id)
 			               ->create();
             
@@ -155,7 +155,8 @@ class UserService extends AbstractService
 			$daftarUser = User::find(
 				[
 					'conditions' => '',
-					'bind'       => []
+					'bind'       => [],
+					'column'	 => ['id', 'nama', 'pass', 'login', 'perusahaan', 'office_store_outlet', 'hak_akses']
 				]
 			);
 
@@ -166,7 +167,7 @@ class UserService extends AbstractService
 			$i = 0;
 			$hasil = array();
             foreach ($daftarUser as $user) {
-				$detail_office = $user->getRelated('detail_office_store_outlet');
+				$detail_office = $user->getRelated('detail_office_store_outlet');				
                 $detail_office->setPropinsi($detail_office->getRelated('detail_propinsi'));
 				$detail_office->setKabupaten($detail_office->getRelated('detail_kabupaten'));
 				$detail_office->setKecamatan($detail_office->getRelated('detail_kecamatan'));
@@ -194,6 +195,7 @@ class UserService extends AbstractService
             }
 
 			return $hasil; 
+			// return $daftarUser->toArray();
 		} catch (PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}

@@ -20,7 +20,7 @@ class HakAkses extends Model
             Modul::class,
             'id',
             [
-                'reusable' => true,
+                'reusable' => false,
                 'alias'    => 'detail_modul'
             ]
         );
