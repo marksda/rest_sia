@@ -4,6 +4,7 @@ namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
 use MyApp\Models\OfficeStoreOutlet;
+use MyApp\Models\HakAkses;
 
 class User extends Model
 {
@@ -26,6 +27,15 @@ class User extends Model
             [
                 'reusable' => true,
                 'alias'    => 'detail_office_store_outlet'
+            ]
+        );
+        $this->hasOne(
+            'hak_akses', 
+            HakAkses::class,
+            'id',
+            [
+                'reusable' => true,
+                'alias'    => 'detail_hak_akses'
             ]
         );
     }

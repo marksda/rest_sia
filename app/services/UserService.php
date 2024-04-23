@@ -180,8 +180,14 @@ class UserService extends AbstractService
 
                 $detail_office->setPerusahaan($perusahaan);
 
+				$hak_akses = $user->getRelated('detail_hak_akses');
+				$modul = $hak_akses->getRelated('detail_modul');
+				$hak_akses->setModul($modul);
+
 				$user->setPerusahaan($perusahaan);
 				$user->setOffice_store_outlet($detail_office);
+				$user->setHak_akses($hak_akses);
+				$user->setPass(null);
 
 				$hasil[$i] = $user;
 				$i++;
