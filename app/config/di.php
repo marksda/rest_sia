@@ -3,7 +3,7 @@
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Encryption\Security;
 use Phalcon\Db\Adapter\Pdo\Postgresql;
-use MyApp\Services\UsersService;
+use MyApp\Services\UserService;
 use MyApp\Services\TokensService;
 use MyApp\Services\BarangService;
 use MyApp\Services\PropinsiService;
@@ -43,8 +43,8 @@ $di->setShared(
 );
 
 $di->setShared(
-    'usersService',
-    UsersService::class
+    'userService',
+    UserService::class
 );
 
 $di->setShared(

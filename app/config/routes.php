@@ -1,7 +1,7 @@
 <?php
 
 use Phalcon\Mvc\Micro\Collection as MicroCollection;
-use MyApp\Controllers\UsersController;
+use MyApp\Controllers\UserController;
 use MyApp\Controllers\TokensController;
 use MyApp\Controllers\BarangController;
 use MyApp\Controllers\PropinsiController;
@@ -20,12 +20,12 @@ $parts = explode("/", $path);
 $collection = $parts[2];
 
 switch ($collection) {    
-    case 'users':
+    case 'user':
         $userCollection = new MicroCollection();
 
         $userCollection
-            ->setHandler(UsersController::class, true)
-            ->setPrefix('/api/users')
+            ->setHandler(UserController::class, true)
+            ->setPrefix('/api/user')
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ;
