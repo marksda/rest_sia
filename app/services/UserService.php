@@ -34,7 +34,11 @@ class UserService extends AbstractService
         } catch (PDOException $e) {
             if ($e->getCode() == 23505) {
 				throw new ServiceException('User already exists', self::ERROR_ALREADY_EXISTS, $e);
-			} else {
+			} 
+			else if ($e->getCode() == 23503){
+				throw new ServiceException('Foreign key error', self::ERROR_FOREIGN_KEY_VIOLATION, $e);
+			}
+			else {
 				throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 			}
         }
