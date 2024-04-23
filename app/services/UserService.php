@@ -155,8 +155,7 @@ class UserService extends AbstractService
 			$daftarUser = User::find(
 				[
 					'conditions' => '',
-					'bind'       => [],
-					'column'	 => ['id', 'nama', 'pass', 'login', 'perusahaan', 'office_store_outlet', 'hak_akses']
+					'bind'       => []
 				]
 			);
 
@@ -195,7 +194,6 @@ class UserService extends AbstractService
             }
 
 			return $hasil; 
-			// return $daftarUser->toArray();
 		} catch (PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
