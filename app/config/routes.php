@@ -13,6 +13,7 @@ use MyApp\Controllers\OfficeStoreOutletController;
 use MyApp\Controllers\JenisJurnalController;
 use MyApp\Controllers\HakAksesController;
 use MyApp\Controllers\ModulController;
+use MyApp\Controllers\JurnalController;
 
 
 $path = $app->request->getURI(true);
@@ -195,7 +196,22 @@ switch ($collection) {
 
         $app->mount($modulCollection);
 
-        break;        
+        break;   
+    case 'jurnal':
+        $jurnalCollection = new MicroCollection();
+
+        $jurnalCollection
+            ->setHandler(JurnalController::class, true)
+            ->setPrefix('/api/jurnal')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idJenisJurnalLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idJenisJurnalLama:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($jurnalCollection);
+
+        break;      
     default:
         // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
         break;
