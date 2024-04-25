@@ -2,39 +2,39 @@
 
 namespace MyApp\Services;
 
-use MyApp\Models\Transaksi;
+use MyApp\Models\Jurnal;
 use Phalcon\Encryption\Security\Random;
 
 
-class TransaksiService extends AbstractService
+class JurnalService extends AbstractService
 {
 
 	/**
-	 * Creating a new Transaksi
+	 * Creating a new Jurnal
 	 *
-	 * @param json $transaksiData
+	 * @param json $jurnalData
 	 */
-    public function createTransaksi($transaksiData)
+    public function createJurnal($jurnalData)
     {
         try {
             $random = new Random();
-            $transaksi = new Transaksi();
-            $result = $transaksi->setId($random->base58(10))
-			               ->setNama($transaksiData->nama)
-			               ->setKeterangan($transaksiData->keterangan)
-                           ->setTanggal($transaksiData->tanggal)
-						   ->setJenis_jurnal($transaksiData->jenis_jurnal)
-						   ->setPerusahaan($transaksiData->perusahaan->id)
-						   ->setOffice_store_outlet($transaksiData->office_store_outlet->id)
-						   ->setRef_bukti($transaksiData->ref_bukti)
+            $jurnal = new Jurnal();
+            $result = $jurnal->setId($random->base58(10))
+			               ->setNama($jurnalData->nama)
+			               ->setKeterangan($jurnalData->keterangan)
+                           ->setTanggal($jurnalData->tanggal)
+						   ->setJenis_jurnal($jurnalData->jenis_jurnal)
+						   ->setPerusahaan($jurnalData->perusahaan->id)
+						   ->setOffice_store_outlet($jurnalData->office_store_outlet->id)
+						   ->setRef_bukti($jurnalData->ref_bukti)
 			               ->create();
             
 			if (!$result) {
-				throw new ServiceException('Unable to create Transaksi', self::ERROR_UNABLE_CREATE_ITEM);
+				throw new ServiceException('Unable to create Jurnal', self::ERROR_UNABLE_CREATE_ITEM);
 			}
         } catch (PDOException $e) {
             if ($e->getCode() == 23505) {
-				throw new ServiceException('Transaksi already exists', self::ERROR_ALREADY_EXISTS, $e);
+				throw new ServiceException('Jurnal already exists', self::ERROR_ALREADY_EXISTS, $e);
 			} 
 			else if ($e->getCode() == 23503){
 				throw new ServiceException('Foreign key error', self::ERROR_FOREIGN_KEY_VIOLATION, $e);
@@ -46,17 +46,17 @@ class TransaksiService extends AbstractService
     }
 
 	/**
-	 * Updating transaksi
+	 * Updating jurnal
 	 *
      * @param string $idLama
 	 * @param string $idPerusahaanLama
 	 * @param string $idJenisJurnalLama
-	 * @param json $transaksiDataBaru
+	 * @param json $jurnalDataBaru
 	 */
-	public function updateTransaksi($idLama, $idPerusahaanLama, $idJenisJurnalLama, $transaksiDataBaru)
+	public function updateJurnal($idLama, $idPerusahaanLama, $idJenisJurnalLama, $jurnalDataBaru)
 	{
 		try {
-            $transaksi = Transaksi::findFirst(
+            $jurnal = Jurnal::findFirst(
 				[
 					'conditions' => 'id = :id: AND ' .
 									'jenis_jurnal > :jenisJurnal: AND ' .
@@ -69,15 +69,15 @@ class TransaksiService extends AbstractService
 				]
 			);
 
-			if($transaksi == null) {
-				throw new ServiceException('Unable to update transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
+			if($jurnal == null) {
+				throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
 			}		
 			
-			if($idLama != $transaksiDataBaru->id && 
-						$idJenisJurnalLama != $transaksiDataBaru->jenis_jurnal && $idPerusahaanLama != $transaksiDataBaru->perusahaan) {
+			if($idLama != $jurnalDataBaru->id && 
+						$idJenisJurnalLama != $jurnalDataBaru->jenis_jurnal && $idPerusahaanLama != $jurnalDataBaru->perusahaan) {
 				$sql     = "
 				UPDATE 
-					transaksi.tbl_Transaksi
+					jurnal.tbl_Jurnal
 				SET 
 					id = :idBaru, 
 					keterangan = :keterangan,
@@ -93,31 +93,31 @@ class TransaksiService extends AbstractService
 				$success = $this->db->execute(
 					$sql,
 					[
-						'idBaru' => $transaksiDataBaru->id,
-						'keterangan' => $transaksiDataBaru->keterangan,
-                        'tanggal' => $transaksiDataBaru->tanggal,
-						'jenisJurnal' => $transaksiDataBaru->jenis_jurnal,
-						'perusahaan' => $transaksiDataBaru->perusahaan->id,
-						'office' => $transaksiDataBaru->office_store_outlet->id,
-						'refBukti' => $transaksiDataBaru->ref_bukti
+						'idBaru' => $jurnalDataBaru->id,
+						'keterangan' => $jurnalDataBaru->keterangan,
+                        'tanggal' => $jurnalDataBaru->tanggal,
+						'jenisJurnal' => $jurnalDataBaru->jenis_jurnal,
+						'perusahaan' => $jurnalDataBaru->perusahaan->id,
+						'office' => $jurnalDataBaru->office_store_outlet->id,
+						'refBukti' => $jurnalDataBaru->ref_bukti
 					]
 				);
 
 				if(false === $success) {
-					throw new ServiceException('Unable to update transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
+					throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
 				}
 			}
 			else {
-				$transaksi->setKeterangan($transaksiDataBaru->keterangan);
-                $transaksi->setTanggal($transaksiDataBaru->tanggal);
-				$transaksi->setJenis_jurnal($transaksiDataBaru->jenis_jurnal);
-				$transaksi->setPerusahaan($transaksiDataBaru->perusahaan->id);
-				$transaksi->setOffice_store_outlet($transaksiDataBaru->office_store_outlet->id);
-				$transaksi->setRef_bukti($transaksiDataBaru->ref_bukti);
-				$result = $transaksi->update();
+				$jurnal->setKeterangan($jurnalDataBaru->keterangan);
+                $jurnal->setTanggal($jurnalDataBaru->tanggal);
+				$jurnal->setJenis_jurnal($jurnalDataBaru->jenis_jurnal);
+				$jurnal->setPerusahaan($jurnalDataBaru->perusahaan->id);
+				$jurnal->setOffice_store_outlet($jurnalDataBaru->office_store_outlet->id);
+				$jurnal->setRef_bukti($jurnalDataBaru->ref_bukti);
+				$result = $jurnal->update();
 
 				if ( false === $result) {
-					throw new ServiceException('Unable to update transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
+					throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
 				}
 			}
 		} catch (\PDOException $e) {
@@ -126,7 +126,7 @@ class TransaksiService extends AbstractService
 	}
 
 	/**
-	 * Delete an existing transaksi
+	 * Delete an existing jurnal
 	 *
 	 * @param string $idLama
 	 * @param string $idPerusahaanLama
@@ -135,7 +135,7 @@ class TransaksiService extends AbstractService
 	public function deleteHakAkses($idLama, $idPerusahaanLama, $idJenisJurnalLama)
 	{
 		try {
-			$transaksi = Transaksi::findFirst(
+			$jurnal = Jurnal::findFirst(
 				[
 					'conditions' => 'id = :id: AND ' .
 									'jenis_jurnal > :jenisJurnal: AND ' .
@@ -148,12 +148,12 @@ class TransaksiService extends AbstractService
 				]
 			);
 
-			if($transaksi == null) {
-				throw new ServiceException('Transaksi not found', self::ERROR_ITEM_NOT_FOUND);
+			if($jurnal == null) {
+				throw new ServiceException('Jurnal not found', self::ERROR_ITEM_NOT_FOUND);
 			}
 			
-			if (false === $transaksi->delete()) {
-				throw new ServiceException('Unable to delete transaksi', self::ERROR_UNABLE_DELETE_ITEM);
+			if (false === $jurnal->delete()) {
+				throw new ServiceException('Unable to delete jurnal', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
@@ -161,28 +161,28 @@ class TransaksiService extends AbstractService
 	}
 
 	/**
-	 * Returns Transaksi list
+	 * Returns Jurnal list
 	 *
 	 * @return array
 	 */
-    public function getTransaksiList()
+    public function getJurnalList()
     {
         try {
-			$daftarTransaksi = Transaksi::find(
+			$daftarJurnal = Jurnal::find(
 				[
 					'conditions' => '',
 					'bind'       => []
 				]
 			);
 
-			if (!$daftarTransaksi) {
+			if (!$daftarJurnal) {
 				return [];
 			}
 
 			// $i = 0;
 			// $hasil = array();
-            // foreach ($daftarTransaksi as $Transaksi) {
-			// 	$detail_office = $Transaksi->getRelated('detail_office_store_outlet');				
+            // foreach ($daftarJurnal as $Jurnal) {
+			// 	$detail_office = $Jurnal->getRelated('detail_office_store_outlet');				
             //     $detail_office->setPropinsi($detail_office->getRelated('detail_propinsi'));
 			// 	$detail_office->setKabupaten($detail_office->getRelated('detail_kabupaten'));
 			// 	$detail_office->setKecamatan($detail_office->getRelated('detail_kecamatan'));
@@ -196,20 +196,20 @@ class TransaksiService extends AbstractService
 
             //     $detail_office->setPerusahaan($perusahaan);
 
-			// 	$hak_akses = $Transaksi->getRelated('detail_hak_akses');
+			// 	$hak_akses = $Jurnal->getRelated('detail_hak_akses');
 			// 	$modul = $hak_akses->getRelated('detail_modul');
 			// 	$hak_akses->setModul($modul);
 
-			// 	$Transaksi->setPerusahaan($perusahaan);
-			// 	$Transaksi->setOffice_store_outlet($detail_office);
-			// 	$Transaksi->setHak_akses($hak_akses);
-			// 	$Transaksi->setPass(null);
+			// 	$Jurnal->setPerusahaan($perusahaan);
+			// 	$Jurnal->setOffice_store_outlet($detail_office);
+			// 	$Jurnal->setHak_akses($hak_akses);
+			// 	$Jurnal->setPass(null);
 
-			// 	$hasil[$i] = $Transaksi;
+			// 	$hasil[$i] = $Jurnal;
 			// 	$i++;
             // }
 
-			return $daftarTransaksi->toArray(); 
+			return $daftarJurnal->toArray(); 
 		} catch (PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}

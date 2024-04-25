@@ -4,7 +4,7 @@ namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
 
-class Transaksi extends Model
+class Jurnal extends Model
 {
     protected $id; 
     protected $keterangan; 
