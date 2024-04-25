@@ -12,20 +12,21 @@ class TransaksiService extends AbstractService
 	/**
 	 * Creating a new Transaksi
 	 *
-	 * @param json $TransaksiData
+	 * @param json $transaksiData
 	 */
-    public function createTransaksi($TransaksiData)
+    public function createTransaksi($transaksiData)
     {
         try {
             $random = new Random();
-            $Transaksi = new Transaksi();
-            $result = $Transaksi->setId($random->base58(10))
-			               ->setNama($TransaksiData->nama)
-			               ->setPass($this->security->hash($TransaksiData->pass))
-                           ->setLogin($TransaksiData->login)
-						   ->setPerusahaan($TransaksiData->perusahaan->id)
-						   ->setOffice_store_outlet($TransaksiData->office_store_outlet->id)
-						   ->setHak_akses($TransaksiData->hak_akses->id)
+            $transaksi = new Transaksi();
+            $result = $transaksi->setId($random->base58(10))
+			               ->setNama($transaksiData->nama)
+			               ->setKeterangan($transaksiData->keterangan)
+                           ->setTanggal($transaksiData->tanggal)
+						   ->setJenis_jurnal($transaksiData->jenis_jurnal)
+						   ->setPerusahaan($transaksiData->perusahaan->id)
+						   ->setOffice_store_outlet($transaksiData->office_store_outlet->id)
+						   ->setRef_bukti($transaksiData->ref_bukti)
 			               ->create();
             
 			if (!$result) {
@@ -45,72 +46,78 @@ class TransaksiService extends AbstractService
     }
 
 	/**
-	 * Updating Transaksi
+	 * Updating transaksi
 	 *
-     * @param string $TransaksiIdLama
-	 * @param json $TransaksiDataBaru
+     * @param string $idLama
+	 * @param string $idPerusahaanLama
+	 * @param string $idJenisJurnalLama
+	 * @param json $transaksiDataBaru
 	 */
-	public function updateTransaksi($TransaksiIdLama, $TransaksiDataBaru)
+	public function updateTransaksi($idLama, $idPerusahaanLama, $idJenisJurnalLama, $transaksiDataBaru)
 	{
 		try {
-
-            $Transaksi = Transaksi::findFirst(
+            $transaksi = Transaksi::findFirst(
 				[
-					'conditions' => 'id = :id:',
+					'conditions' => 'id = :id: AND ' .
+									'jenis_jurnal > :jenisJurnal: AND ' .
+									'perusahaan = :perusahaan:',
 					'bind'       => [
-						'id' => $TransaksiIdLama
+						'id' => $idLama,
+						'jenisJurnal' => $idJenisJurnalLama,						
+						'perusahaan' => $idPerusahaanLama
 					]
 				]
 			);
 
-			if($Transaksi == null) {
-				throw new ServiceException('Unable to update Transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
+			if($transaksi == null) {
+				throw new ServiceException('Unable to update transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
 			}		
 			
-			if($TransaksiIdLama != $TransaksiDataBaru->id) {
+			if($idLama != $transaksiDataBaru->id && 
+						$idJenisJurnalLama != $transaksiDataBaru->jenis_jurnal && $idPerusahaanLama != $transaksiDataBaru->perusahaan) {
 				$sql     = "
 				UPDATE 
-					public.tbl_Transaksis
+					transaksi.tbl_Transaksi
 				SET 
 					id = :idBaru, 
-					nama = :nama,
-                    pass = :password,
-					login = : TransaksiName,
+					keterangan = :keterangan,
+                    tanggal = :tanggal,
+					jenis_jurnal = : jenisJurnal,
 					perusahaan = :perusahaan,
 					office_store_outlet = :office,
-					hak_akses = : hakAkses
+					ref_bukti = : refBukti
 				WHERE
-					id = :idLama
+					id = :idLama AND jenis_jurnal = :idJenisJurnal AND perusahaan = :idPerusahaan
 				";
 
 				$success = $this->db->execute(
 					$sql,
 					[
-						'idBaru' => $TransaksiDataBaru->id,
-						'nama' => $TransaksiDataBaru->nama,
-                        'password' => $this->security->hash($TransaksiDataBaru->pass),
-						'TransaksiName' => $TransaksiDataBaru->nama,
-						'perusahaan' => $TransaksiDataBaru->perusahaan->id,
-						'office' => $TransaksiDataBaru->office_store_outlet->id,
-						'hakAkses' => $TransaksiDataBaru->hak_akses->id
+						'idBaru' => $transaksiDataBaru->id,
+						'keterangan' => $transaksiDataBaru->keterangan,
+                        'tanggal' => $transaksiDataBaru->tanggal,
+						'jenisJurnal' => $transaksiDataBaru->jenis_jurnal,
+						'perusahaan' => $transaksiDataBaru->perusahaan->id,
+						'office' => $transaksiDataBaru->office_store_outlet->id,
+						'refBukti' => $transaksiDataBaru->ref_bukti
 					]
 				);
 
 				if(false === $success) {
-					throw new ServiceException('Unable to update Transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
+					throw new ServiceException('Unable to update transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
 				}
 			}
 			else {
-				$Transaksi->setNama($TransaksiDataBaru->nama);
-                $Transaksi->setPass($this->security->hash($TransaksiDataBaru->pass));
-				$Transaksi->setLogin($TransaksiDataBaru->login);
-				$Transaksi->setPerusahaan($TransaksiDataBaru->perusahaan->id);
-				$Transaksi->setOffice_store_outlet($TransaksiDataBaru->office_store_outlet->id);
-				$Transaksi->setHak_akses($TransaksiDataBaru->hak_akses->id);
-				$result = $Transaksi->update();
+				$transaksi->setKeterangan($transaksiDataBaru->keterangan);
+                $transaksi->setTanggal($transaksiDataBaru->tanggal);
+				$transaksi->setJenis_jurnal($transaksiDataBaru->jenis_jurnal);
+				$transaksi->setPerusahaan($transaksiDataBaru->perusahaan->id);
+				$transaksi->setOffice_store_outlet($transaksiDataBaru->office_store_outlet->id);
+				$transaksi->setRef_bukti($transaksiDataBaru->ref_bukti);
+				$result = $transaksi->update();
 
 				if ( false === $result) {
-					throw new ServiceException('Unable to update Transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
+					throw new ServiceException('Unable to update transaksi', self::ERROR_UNABLE_UPDATE_ITEM);
 				}
 			}
 		} catch (\PDOException $e) {
@@ -119,34 +126,39 @@ class TransaksiService extends AbstractService
 	}
 
 	/**
-	 * Delete an existing Transaksi
+	 * Delete an existing transaksi
 	 *
-	 * @param int $TransaksiId
+	 * @param string $idLama
+	 * @param string $idPerusahaanLama
+	 * @param string $idJenisJurnalLama
 	 */
-	public function deleteHakAkses($TransaksiId)
+	public function deleteHakAkses($idLama, $idPerusahaanLama, $idJenisJurnalLama)
 	{
 		try {
-			$Transaksi = Transaksi::findFirst(
+			$transaksi = Transaksi::findFirst(
 				[
-					'conditions' => 'id = :id:',
+					'conditions' => 'id = :id: AND ' .
+									'jenis_jurnal > :jenisJurnal: AND ' .
+									'perusahaan = :perusahaan:',
 					'bind'       => [
-						'id' => $TransaksiId
+						'id' => $idLama,
+						'jenisJurnal' => $idJenisJurnalLama,						
+						'perusahaan' => $idPerusahaanLama
 					]
 				]
 			);
 
-			if($Transaksi == null) {
+			if($transaksi == null) {
 				throw new ServiceException('Transaksi not found', self::ERROR_ITEM_NOT_FOUND);
 			}
 			
-			if (false === $Transaksi->delete()) {
-				throw new ServiceException('Unable to delete Transaksi', self::ERROR_UNABLE_DELETE_ITEM);
+			if (false === $transaksi->delete()) {
+				throw new ServiceException('Unable to delete transaksi', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
 	}
-
 
 	/**
 	 * Returns Transaksi list
@@ -167,37 +179,37 @@ class TransaksiService extends AbstractService
 				return [];
 			}
 
-			$i = 0;
-			$hasil = array();
-            foreach ($daftarTransaksi as $Transaksi) {
-				$detail_office = $Transaksi->getRelated('detail_office_store_outlet');				
-                $detail_office->setPropinsi($detail_office->getRelated('detail_propinsi'));
-				$detail_office->setKabupaten($detail_office->getRelated('detail_kabupaten'));
-				$detail_office->setKecamatan($detail_office->getRelated('detail_kecamatan'));
-				$detail_office->setDesa($detail_office->getRelated('detail_desa'));
+			// $i = 0;
+			// $hasil = array();
+            // foreach ($daftarTransaksi as $Transaksi) {
+			// 	$detail_office = $Transaksi->getRelated('detail_office_store_outlet');				
+            //     $detail_office->setPropinsi($detail_office->getRelated('detail_propinsi'));
+			// 	$detail_office->setKabupaten($detail_office->getRelated('detail_kabupaten'));
+			// 	$detail_office->setKecamatan($detail_office->getRelated('detail_kecamatan'));
+			// 	$detail_office->setDesa($detail_office->getRelated('detail_desa'));
 
-                $perusahaan = $detail_office->getRelated('detail_perusahaan');
-                $perusahaan->setPropinsi($perusahaan->getRelated('detail_propinsi'));
-				$perusahaan->setKabupaten($perusahaan->getRelated('detail_kabupaten'));
-				$perusahaan->setKecamatan($perusahaan->getRelated('detail_kecamatan'));
-				$perusahaan->setDesa($perusahaan->getRelated('detail_desa'));
+            //     $perusahaan = $detail_office->getRelated('detail_perusahaan');
+            //     $perusahaan->setPropinsi($perusahaan->getRelated('detail_propinsi'));
+			// 	$perusahaan->setKabupaten($perusahaan->getRelated('detail_kabupaten'));
+			// 	$perusahaan->setKecamatan($perusahaan->getRelated('detail_kecamatan'));
+			// 	$perusahaan->setDesa($perusahaan->getRelated('detail_desa'));
 
-                $detail_office->setPerusahaan($perusahaan);
+            //     $detail_office->setPerusahaan($perusahaan);
 
-				$hak_akses = $Transaksi->getRelated('detail_hak_akses');
-				$modul = $hak_akses->getRelated('detail_modul');
-				$hak_akses->setModul($modul);
+			// 	$hak_akses = $Transaksi->getRelated('detail_hak_akses');
+			// 	$modul = $hak_akses->getRelated('detail_modul');
+			// 	$hak_akses->setModul($modul);
 
-				$Transaksi->setPerusahaan($perusahaan);
-				$Transaksi->setOffice_store_outlet($detail_office);
-				$Transaksi->setHak_akses($hak_akses);
-				$Transaksi->setPass(null);
+			// 	$Transaksi->setPerusahaan($perusahaan);
+			// 	$Transaksi->setOffice_store_outlet($detail_office);
+			// 	$Transaksi->setHak_akses($hak_akses);
+			// 	$Transaksi->setPass(null);
 
-				$hasil[$i] = $Transaksi;
-				$i++;
-            }
+			// 	$hasil[$i] = $Transaksi;
+			// 	$i++;
+            // }
 
-			return $hasil; 
+			return $daftarTransaksi->toArray(); 
 		} catch (PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
