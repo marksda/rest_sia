@@ -19,7 +19,6 @@ class JurnalService extends AbstractService
             $random = new Random();
             $jurnal = new Jurnal();
             $result = $jurnal->setId($random->base58(10))
-			               ->setNama($jurnalData->nama)
 			               ->setKeterangan($jurnalData->keterangan)
                            ->setTanggal($jurnalData->tanggal)
 						   ->setJenis_jurnal($jurnalData->jenis_jurnal)
@@ -58,7 +57,7 @@ class JurnalService extends AbstractService
             $jurnal = Jurnal::findFirst(
 				[
 					'conditions' => 'id = :id: AND ' .
-									'jenis_jurnal > :jenisJurnal: AND ' .
+									'jenis_jurnal = :jenisJurnal: AND ' .
 									'perusahaan = :perusahaan:',
 					'bind'       => [
 						'id' => $idLama,
@@ -109,8 +108,6 @@ class JurnalService extends AbstractService
 			else {
 				$jurnal->setKeterangan($jurnalDataBaru->keterangan);
                 $jurnal->setTanggal($jurnalDataBaru->tanggal);
-				$jurnal->setJenis_jurnal($jurnalDataBaru->jenis_jurnal);
-				$jurnal->setPerusahaan($jurnalDataBaru->perusahaan->id);
 				$jurnal->setOffice_store_outlet($jurnalDataBaru->office_store_outlet->id);
 				$jurnal->setRef_bukti($jurnalDataBaru->ref_bukti);
 				$result = $jurnal->update();
