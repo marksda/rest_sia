@@ -5,7 +5,6 @@ namespace MyApp\Services;
 use MyApp\Models\Jurnal;
 use Phalcon\Encryption\Security\Random;
 
-
 class JurnalService extends AbstractService
 {
 
