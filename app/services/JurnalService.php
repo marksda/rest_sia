@@ -132,7 +132,7 @@ class JurnalService extends AbstractService
 	 * @param string $idPerusahaanLama
 	 * @param string $idJenisJurnalLama
 	 */
-	public function deleteHakAkses($idLama, $idPerusahaanLama, $idJenisJurnalLama)
+	public function deleteJurnal($idLama, $idPerusahaanLama, $idJenisJurnalLama)
 	{
 		try {
 			$jurnal = Jurnal::findFirst(
