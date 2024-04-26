@@ -16,10 +16,12 @@ class PerusahaanService extends AbstractService
 	 */
     public function createPerusahaan($perusahaanData)
     {
+		$this->db->begin();
         try {
             $random = new Random();
             $perusahaan = new Perusahaan();
-            $result = $perusahaan->setId($random->base58(12))
+			$id = $random->base58(12);
+            $result = $perusahaan->setId($id)
 			               ->setNama($perusahaanData->nama)
                            ->setNpwp($perusahaanData->npwp)
                            ->setPropinsi($perusahaanData->propinsi->id)
@@ -35,13 +37,51 @@ class PerusahaanService extends AbstractService
 			if (!$result) {
 				throw new ServiceException('Unable to create perusahaan', self::ERROR_UNABLE_CREATE_ITEM);
 			}
-        } catch (PDOException $e) {
+
+			$sqlCreateTablePartition = "CREATE TABLE public.akun_".$id." PARTITION OF public.akun FOR VALUES IN ('".$id."')";
+			
+			$success = $this->db->execute($sqlCreateTablePartition);
+
+			if(false === $success) {
+				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+			}
+
+			$sqlFetchAkunTemplate = '
+				SELECT 
+					id, header, level, nama
+				FROM 
+					public.tbl_akun_template
+				';
+
+			$rows = $this->db->fetchAll($sqlFetchAkunTemplate);
+
+			$data = array();
+			$i = 0;
+			foreach ($rows as $rowData) {
+				$data[$i] = $rowData;
+				$data[$i]['perusahaan'] = $id;
+				$i++;
+				// foreach ($rowData as $rowField) {
+				// 	$data[] = $rowField;
+				// }
+				// $data[] = $id;
+			}
+
+			$values = str_repeat('?,', 4) . '?';
+			$sqlInsertAkun = "INSERT INTO public.akun (id, header, level, nama, perusahaan) VALUES " .
+							str_repeat("($values),", count($rows) - 1) . "($values)"; 
+
+			$stmt = $this->db->prepare($sqlInsertAkun);
+			$stmt->execute($data);
+			$this->db->commit();
+        } catch (\PDOException $e) {
+			$this->db->rollback();
             if ($e->getCode() == 23505) {
 				throw new ServiceException('Perusahaan already exists', self::ERROR_ALREADY_EXISTS, $e);
 			} else {
 				throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 			}
-        }
+        } 
     }
 
     /**
