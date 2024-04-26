@@ -46,29 +46,29 @@ class PerusahaanService extends AbstractService
 				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
 			}
 
-			$sqlFetchAkunTemplate = '
+			$sqlFetchAkunTemplate = "
 				SELECT 
-					id, header, level, nama
-				FROM 
+					id, '" . $id . "' as perusahaan, header::int, level, nama " .
+				"FROM 
 					public.tbl_akun_template
-				';
+				";
 
 			$rows = $this->db->fetchAll($sqlFetchAkunTemplate);
 
 			$data = array();
-			$i = 0;
+			// $i = 0;
 			foreach ($rows as $rowData) {
-				$data[$i] = $rowData;
-				$data[$i]['perusahaan'] = $id;
-				$i++;
-				// foreach ($rowData as $rowField) {
-				// 	$data[] = $rowField;
-				// }
+				// $data[$i] = $rowData;
+				// $data[$i]['perusahaan'] = $id;
+				// $i++;
+				foreach ($rowData as $rowField) {
+					$data[] = $rowField;
+				}
 				// $data[] = $id;
 			}
 
 			$values = str_repeat('?,', 4) . '?';
-			$sqlInsertAkun = "INSERT INTO public.akun (id, header, level, nama, perusahaan) VALUES " .
+			$sqlInsertAkun = "INSERT INTO public.akun VALUES " .
 							str_repeat("($values),", count($rows) - 1) . "($values)"; 
 
 			$stmt = $this->db->prepare($sqlInsertAkun);
