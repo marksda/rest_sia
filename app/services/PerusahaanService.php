@@ -78,6 +78,15 @@ class PerusahaanService extends AbstractService
 				$this->db->rollback();
 				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
 			}
+
+			$sqlCreateTablePartition = "CREATE TABLE transaksi.detail_jurnal_".$id." PARTITION OF transaksi.tbl_detail_jurnal FOR VALUES IN ('".$id."')";
+			
+			$success = $this->db->execute($sqlCreateTablePartition);
+
+			if(false === $success) {
+				$this->db->rollback();
+				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+			}
 			
 			$this->db->commit();
         } catch (\PDOException $e) {
