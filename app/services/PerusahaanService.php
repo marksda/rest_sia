@@ -38,11 +38,12 @@ class PerusahaanService extends AbstractService
 				throw new ServiceException('Unable to create perusahaan', self::ERROR_UNABLE_CREATE_ITEM);
 			}
 
-			$sqlCreateTablePartition = "CREATE TABLE public.akun_".$id." PARTITION OF public.akun FOR VALUES IN ('".$id."')";
+			$sqlCreateTablePartition = "CREATE TABLE public.akun_".$id." PARTITION OF public.tbl_akun FOR VALUES IN ('".$id."')";
 			
 			$success = $this->db->execute($sqlCreateTablePartition);
 
 			if(false === $success) {
+				$this->db->rollback();
 				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
 			}
 
@@ -56,23 +57,29 @@ class PerusahaanService extends AbstractService
 			$rows = $this->db->fetchAll($sqlFetchAkunTemplate);
 
 			$data = array();
-			// $i = 0;
 			foreach ($rows as $rowData) {
-				// $data[$i] = $rowData;
-				// $data[$i]['perusahaan'] = $id;
-				// $i++;
 				foreach ($rowData as $rowField) {
 					$data[] = $rowField;
 				}
-				// $data[] = $id;
 			}
 
 			$values = str_repeat('?,', 4) . '?';
-			$sqlInsertAkun = "INSERT INTO public.akun VALUES " .
+			$sqlInsertAkun = "INSERT INTO public.tbl_akun VALUES " .
 							str_repeat("($values),", count($rows) - 1) . "($values)"; 
 
 			$stmt = $this->db->prepare($sqlInsertAkun);
 			$stmt->execute($data);
+
+			$sqlCreateTablePartition = "CREATE TABLE transaksi.jurnal_".$id." PARTITION OF transaksi.tbl_jurnal FOR VALUES IN ('".$id."')";
+			
+			$success = $this->db->execute($sqlCreateTablePartition);
+
+			if(false === $success) {
+				$this->db->rollback();
+				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+			}
+
+			
 			$this->db->commit();
         } catch (\PDOException $e) {
 			$this->db->rollback();
@@ -236,5 +243,4 @@ class PerusahaanService extends AbstractService
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
     }
-
 }
