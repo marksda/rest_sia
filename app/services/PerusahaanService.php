@@ -185,6 +185,7 @@ class PerusahaanService extends AbstractService
 	 */
 	public function deletePerusahaan($perusahaanId)
 	{
+		$this->db->begin();
 		try {
 			$perusahaan = Perusahaan::findFirst(
 				[
@@ -202,7 +203,23 @@ class PerusahaanService extends AbstractService
 			if (false === $perusahaan->delete()) {
 				throw new ServiceException('Unable to delete perusahaan', self::ERROR_UNABLE_DELETE_ITEM);
 			}
+
+			$sqlDropTablePartition = "DROP TABLE public.akun_".$perusahaanId;			
+			$success = $this->db->execute($sqlDropTablePartition);
+			if(false === $success) {
+				$this->db->rollback();
+				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+			}
+
+			$sqlDropTablePartition = "DROP TABLE transaksi.jurnal_".$perusahaanId;			
+			$success = $this->db->execute($sqlDropTablePartition);
+			if(false === $success) {
+				$this->db->rollback();
+				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+			}
+
 		} catch (\PDOException $e) {
+			$this->db->rollback();
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
 	}
