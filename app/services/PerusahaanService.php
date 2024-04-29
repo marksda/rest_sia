@@ -49,7 +49,7 @@ class PerusahaanService extends AbstractService
 
 			$sqlFetchAkunTemplate = "
 				SELECT 
-					id, '" . $id . "' as perusahaan, header::int, level, nama " .
+					'" . $id . "' as perusahaan, header::int, level, nama, id as kode " .
 				"FROM 
 					public.tbl_akun_template
 				";
@@ -58,12 +58,13 @@ class PerusahaanService extends AbstractService
 
 			$data = array();
 			foreach ($rows as $rowData) {
-				foreach ($rowData as $rowField) {
+				$data[] = $random->base58(6);
+				foreach ($rowData as $rowField) {					
 					$data[] = $rowField;
 				}
 			}
 
-			$values = str_repeat('?,', 4) . '?';
+			$values = str_repeat('?,', 5) . '?';
 			$sqlInsertAkun = "INSERT INTO public.tbl_akun VALUES " .
 							str_repeat("($values),", count($rows) - 1) . "($values)"; 
 
@@ -208,29 +209,29 @@ class PerusahaanService extends AbstractService
 				throw new ServiceException('Perusahaan not found', self::ERROR_ITEM_NOT_FOUND);
 			}
 			
-			if (false === $perusahaan->delete()) {
-				throw new ServiceException('Unable to delete perusahaan', self::ERROR_UNABLE_DELETE_ITEM);
-			}
-
-			$sqlDropTablePartition = "DROP TABLE public.akun_".$perusahaanId;			
+			$sqlDropTablePartition = "DROP TABLE transaksi.detail_jurnal_".$perusahaanId;			
 			$success = $this->db->execute($sqlDropTablePartition);
 			if(false === $success) {
 				$this->db->rollback();
-				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+				throw new ServiceException('Unable to delete table partition', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 
 			$sqlDropTablePartition = "DROP TABLE transaksi.jurnal_".$perusahaanId;			
 			$success = $this->db->execute($sqlDropTablePartition);
 			if(false === $success) {
 				$this->db->rollback();
-				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+				throw new ServiceException('Unable to delete table partition', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 
-			$sqlDropTablePartition = "DROP TABLE transaksi.detail_jurnal_".$perusahaanId;			
+			$sqlDropTablePartition = "DROP TABLE public.akun_".$perusahaanId;			
 			$success = $this->db->execute($sqlDropTablePartition);
 			if(false === $success) {
 				$this->db->rollback();
-				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+				throw new ServiceException('Unable to delete table partition', self::ERROR_UNABLE_DELETE_ITEM);
+			}	
+
+			if (false === $perusahaan->delete()) {
+				throw new ServiceException('Unable to delete perusahaan', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 
 			$this->db->commit();

@@ -19,7 +19,7 @@ class OfficeStoreOutletService extends AbstractService
         try {
             $random = new Random();
             $office = new OfficeStoreOutlet();
-            $result = $office->setId($random->base58(5))
+            $result = $office->setId($random->base58(12))
 			               ->setNama($officeData->nama)
                            ->setPropinsi($officeData->propinsi->id)
                            ->setKabupaten($officeData->kabupaten->id)

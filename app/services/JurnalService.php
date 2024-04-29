@@ -18,7 +18,7 @@ class JurnalService extends AbstractService
         try {
             $random = new Random();
             $jurnal = new Jurnal();
-            $result = $jurnal->setId($random->base58(10))
+            $result = $jurnal->setId($random->base58(12))
 			               ->setKeterangan($jurnalData->keterangan)
                            ->setTanggal($jurnalData->tanggal)
 						   ->setJenis_jurnal($jurnalData->jenis_jurnal)
