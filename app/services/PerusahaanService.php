@@ -256,7 +256,7 @@ class PerusahaanService extends AbstractService
             }
 
 			return $hasil; 
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
     }
