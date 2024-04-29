@@ -78,7 +78,6 @@ class PerusahaanService extends AbstractService
 				$this->db->rollback();
 				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
 			}
-
 			
 			$this->db->commit();
         } catch (\PDOException $e) {
@@ -218,6 +217,7 @@ class PerusahaanService extends AbstractService
 				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
 			}
 
+			$this->db->commit();
 		} catch (\PDOException $e) {
 			$this->db->rollback();
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
