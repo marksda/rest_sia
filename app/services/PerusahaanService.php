@@ -209,21 +209,21 @@ class PerusahaanService extends AbstractService
 				throw new ServiceException('Perusahaan not found', self::ERROR_ITEM_NOT_FOUND);
 			}
 			
-			$sqlDropTablePartition = "DROP TABLE transaksi.detail_jurnal_".$perusahaanId;			
+			$sqlDropTablePartition = "DROP TABLE transaksi.detail_jurnal_".$perusahaanId." CASCADE";			
 			$success = $this->db->execute($sqlDropTablePartition);
 			if(false === $success) {
 				$this->db->rollback();
 				throw new ServiceException('Unable to delete table partition', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 
-			$sqlDropTablePartition = "DROP TABLE transaksi.jurnal_".$perusahaanId;			
+			$sqlDropTablePartition = "DROP TABLE transaksi.jurnal_".$perusahaanId." CASCADE";			
 			$success = $this->db->execute($sqlDropTablePartition);
 			if(false === $success) {
 				$this->db->rollback();
 				throw new ServiceException('Unable to delete table partition', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 
-			$sqlDropTablePartition = "DROP TABLE public.akun_".$perusahaanId;			
+			$sqlDropTablePartition = "DROP TABLE public.akun_".$perusahaanId." CASCADE";			
 			$success = $this->db->execute($sqlDropTablePartition);
 			if(false === $success) {
 				$this->db->rollback();
