@@ -8,18 +8,18 @@ use MyApp\Services\AbstractService;
 use MyApp\Controllers\HttpExceptions\Http422Exception;
 use MyApp\Controllers\HttpExceptions\Http500Exception;
 
-class JurnalController extends Controller
+class AkunController extends Controller
 {
 
     /**
-	 * Adding jurnal
+	 * Adding akun
 	 */
     public function addAction()
     {
         $data = $this->request->getJsonRawBody();
         
         try {
-            $this->jurnalService->createJurnal($data);
+            $this->akunService->createAkun($data);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_ALREADY_EXISTS:
@@ -32,19 +32,16 @@ class JurnalController extends Controller
     }
 
     /**
-     * Updating existing jurnal 
+     * Updating existing akun
      *
-     * @param string $idLama
-	 * @param string $idPerusahaanLama
-	 * @param string $idJenisJurnalLama
-     * 
+     * @param string $akunIdLama
      */
     public function updateAction($idLama, $idPerusahaanLama)
     {
         $data = $this->request->getJsonRawBody();
         
         try {
-            $this->jurnalService->updateJurnal($idLama, $idPerusahaanLama, $data);
+            $this->akunService->updateAkun($idLama, $idPerusahaanLama, $data);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_ALREADY_EXISTS:
@@ -57,16 +54,14 @@ class JurnalController extends Controller
     }
 
     /**
-     * Delete an existing jurnal
+     * Delete an existing akun
      *
-     * @param string $idLama
-	 * @param string $idPerusahaanLama
-	 * @param string $idJenisJurnalLama
+     * @param string $akunId
      */
     public function deleteAction($idLama, $idPerusahaanLama)
     {
         try {
-            $this->jurnalService->deleteJurnal($idLama, $idPerusahaanLama);
+            $this->akunService->deleteAkun($idLama, $idPerusahaanLama);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_UNABLE_DELETE_ITEM:
@@ -81,18 +76,19 @@ class JurnalController extends Controller
     }
 
     /**
-     * Returns jurnal list
+     * Returns akun list
      *
      * @return array
      */
     public function listAction()
     {
         try {
-            $jurnalList = $this->jurnalService->getJurnalList();
+            $akunList = $this->akunService->getAkunList();
         } catch (ServiceException $e) {
             throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
         }
 
-        return $jurnalList;
+        return $akunList;
     }
+
 }

@@ -10,7 +10,6 @@ use MyApp\Models\Desa;
 
 class Perusahaan extends Model
 {
-
     protected $id; 
     protected $nama; 
     protected $npwp;

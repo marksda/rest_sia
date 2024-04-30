@@ -51,17 +51,14 @@ class JurnalService extends AbstractService
 	 * @param string $idJenisJurnalLama
 	 * @param json $jurnalDataBaru
 	 */
-	public function updateJurnal($idLama, $idPerusahaanLama, $idJenisJurnalLama, $jurnalDataBaru)
+	public function updateJurnal($idLama, $idPerusahaanLama, $jurnalDataBaru)
 	{
 		try {
             $jurnal = Jurnal::findFirst(
 				[
-					'conditions' => 'id = :id: AND ' .
-									'jenis_jurnal = :jenisJurnal: AND ' .
-									'perusahaan = :perusahaan:',
+					'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
 					'bind'       => [
-						'id' => $idLama,
-						'jenisJurnal' => $idJenisJurnalLama,						
+						'id' => $idLama,					
 						'perusahaan' => $idPerusahaanLama
 					]
 				]
@@ -71,8 +68,7 @@ class JurnalService extends AbstractService
 				throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
 			}		
 			
-			if($idLama != $jurnalDataBaru->id && 
-						$idJenisJurnalLama != $jurnalDataBaru->jenis_jurnal && $idPerusahaanLama != $jurnalDataBaru->perusahaan) {
+			if($idLama != $jurnalDataBaru->id && $idPerusahaanLama != $jurnalDataBaru->perusahaan) {
 				$sql     = "
 				UPDATE 
 					jurnal.tbl_Jurnal
@@ -85,7 +81,7 @@ class JurnalService extends AbstractService
 					office_store_outlet = :office,
 					ref_bukti = : refBukti
 				WHERE
-					id = :idLama AND jenis_jurnal = :idJenisJurnal AND perusahaan = :idPerusahaan
+					id = :idLama AND perusahaan = :idPerusahaanLama
 				";
 
 				$success = $this->db->execute(
@@ -97,7 +93,9 @@ class JurnalService extends AbstractService
 						'jenisJurnal' => $jurnalDataBaru->jenis_jurnal,
 						'perusahaan' => $jurnalDataBaru->perusahaan->id,
 						'office' => $jurnalDataBaru->office_store_outlet->id,
-						'refBukti' => $jurnalDataBaru->ref_bukti
+						'refBukti' => $jurnalDataBaru->ref_bukti,
+						'idLama' => $idLama,
+						'idPerusahaanLama' => $idPerusahaanLama
 					]
 				);
 
@@ -108,6 +106,7 @@ class JurnalService extends AbstractService
 			else {
 				$jurnal->setKeterangan($jurnalDataBaru->keterangan);
                 $jurnal->setTanggal($jurnalDataBaru->tanggal);
+				$jurnal->setJenis_jurnal($jurnalDataBaru->jenis_jurnal);
 				$jurnal->setOffice_store_outlet($jurnalDataBaru->office_store_outlet->id);
 				$jurnal->setRef_bukti($jurnalDataBaru->ref_bukti);
 				$result = $jurnal->update();
@@ -128,17 +127,14 @@ class JurnalService extends AbstractService
 	 * @param string $idPerusahaanLama
 	 * @param string $idJenisJurnalLama
 	 */
-	public function deleteJurnal($idLama, $idPerusahaanLama, $idJenisJurnalLama)
+	public function deleteJurnal($idLama, $idPerusahaanLama)
 	{
 		try {
 			$jurnal = Jurnal::findFirst(
 				[
-					'conditions' => 'id = :id: AND ' .
-									'jenis_jurnal > :jenisJurnal: AND ' .
-									'perusahaan = :perusahaan:',
+					'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
 					'bind'       => [
-						'id' => $idLama,
-						'jenisJurnal' => $idJenisJurnalLama,						
+						'id' => $idLama,						
 						'perusahaan' => $idPerusahaanLama
 					]
 				]

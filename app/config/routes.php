@@ -14,6 +14,7 @@ use MyApp\Controllers\JenisJurnalController;
 use MyApp\Controllers\HakAksesController;
 use MyApp\Controllers\ModulController;
 use MyApp\Controllers\JurnalController;
+use MyApp\Controllers\AkunController;
 
 
 $path = $app->request->getURI(true);
@@ -211,7 +212,22 @@ switch ($collection) {
 
         $app->mount($jurnalCollection);
 
-        break;      
+        break;   
+    case 'akun':
+        $akunCollection = new MicroCollection();
+
+        $akunCollection
+            ->setHandler(AkunController::class, true)
+            ->setPrefix('/api/akun')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ;
+
+        $app->mount($akunCollection);
+
+        break;         
     default:
         // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
         break;
