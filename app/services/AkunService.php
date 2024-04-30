@@ -49,12 +49,11 @@ class AkunService extends AbstractService
 	public function updateAkun($idLama, $idPerusahaanLama, $akunDataBaru)
 	{
 		try {
-
             $akun = Akun::findFirst(
 				[
 					'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
 					'bind'       => [
-						'id' => $akunIdLama,
+						'id' => $idLama,
 						'perusahaan' => $idPerusahaanLama
 					]
 				]
