@@ -17,6 +17,7 @@ use MyApp\Services\HakAksesService;
 use MyApp\Services\ModulService;
 use MyApp\Services\JurnalService;
 use MyApp\Services\AkunService;
+use MyApp\Services\DetailJurnalService;
 
 
 $di = new FactoryDefault();
@@ -112,6 +113,11 @@ $di->setShared(
 $di->setShared(
     'akunService',
     AkunService::class
+);
+
+$di->setShared(
+    'detailJurnalService',
+    DetailJurnalService::class
 );
 
 return $di;

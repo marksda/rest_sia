@@ -15,6 +15,7 @@ use MyApp\Controllers\HakAksesController;
 use MyApp\Controllers\ModulController;
 use MyApp\Controllers\JurnalController;
 use MyApp\Controllers\AkunController;
+use MyApp\Controllers\DetailJurnalController;
 
 
 $path = $app->request->getURI(true);
@@ -57,7 +58,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{barangIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{barangId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{barangId:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($barangCollection);
@@ -72,7 +73,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($propinsiCollection);
@@ -87,7 +88,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($kabupatenCollection);
@@ -102,7 +103,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($kecamatanCollection);
@@ -117,7 +118,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($desaCollection);
@@ -132,7 +133,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{perusahaanIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{perusahaanId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{perusahaanId:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($perusahaanCollection);
@@ -147,7 +148,7 @@ switch ($collection) {
                 ->get('/list', 'listAction')
                 ->post('/add', 'addAction')
                 ->put('/{officeIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-                ->delete('/{officeId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+                ->delete('/{officeId:[a-zA-Z0-9\_\-]+}', 'deleteAction')
                 ;
     
             $app->mount($officeCollection);
@@ -162,7 +163,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{jenisJurnalIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{jenisJurnalId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{jenisJurnalId:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($jenisJurnalCollection);
@@ -177,7 +178,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{jenisJurnalIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{jenisJurnalId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{jenisJurnalId:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($hakAksesCollection);
@@ -192,7 +193,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{jenisJurnalIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{jenisJurnalId:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{jenisJurnalId:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($modulCollection);
@@ -207,7 +208,7 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idJenisJurnalLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idJenisJurnalLama:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idJenisJurnalLama:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($jurnalCollection);
@@ -222,7 +223,22 @@ switch ($collection) {
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
             ->put('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            ->delete('/{idLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}', 'deleteAction')
+            ;
+
+        $app->mount($akunCollection);
+
+        break;   
+    case 'detail_jurnal':
+        $akunCollection = new MicroCollection();
+
+        $akunCollection
+            ->setHandler(AkunController::class, true)
+            ->setPrefix('/api/detail_jurnal')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{idJurnalLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idAkunLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{idJurnalLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idAkunLama:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($akunCollection);
