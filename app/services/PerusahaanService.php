@@ -8,7 +8,6 @@ use Phalcon\Encryption\Security\Random;
 
 class PerusahaanService extends AbstractService
 {
-
     /**
 	 * Creating a new perusahaan
 	 *
@@ -231,6 +230,7 @@ class PerusahaanService extends AbstractService
 			}	
 
 			if (false === $perusahaan->delete()) {
+				$this->db->rollback();
 				throw new ServiceException('Unable to delete perusahaan', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 
