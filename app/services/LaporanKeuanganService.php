@@ -16,6 +16,7 @@ class LaporanKeuanganService extends AbstractService
 	 */
     public function createNeracaSaldo($idPerusahaan, $periode) {
         //sumber data berasal dari buku besar
+        //neraca saldo dibuat dengan cara memindahkan saldo akhir setiap akun pada buku besat ke dalam neraca saldo 
     }
 
     /**
@@ -27,6 +28,7 @@ class LaporanKeuanganService extends AbstractService
 	 */
     private function createNeracaSaldoPerusahaanDagangMetodeLabaRugi($idPerusahaan, $periode) {
         //sumber data berasal dari buku besar
+        //neraca saldo dibuat dengan cara memindahkan saldo akhir setiap akun pada buku besat ke dalam neraca saldo 
     }
 
     /**
@@ -37,6 +39,18 @@ class LaporanKeuanganService extends AbstractService
 	 */
     private function createNeracaSaldoPerusahaanJasaMetodeLabaRugi($idPerusahaan) {
         //sumber data berasal dari buku besar
+        //neraca saldo dibuat dengan cara memindahkan saldo akhir setiap akun pada buku besat ke dalam neraca saldo 
+    }
+
+    /**
+	 * Creating a new neraca saldo jurnal penyesuaian
+	 *
+	 * @param json $idPerusahaan
+     * @param int $periode 
+	 */
+    public function createJurnalPenyesuaian($idPerusahaan, $periode) {
+        //sumber data berasal dari buku besar
+        //neraca saldo dibuat dengan cara memindahkan saldo akhir setiap akun pada buku besat ke dalam neraca saldo 
     }
 
     /**
@@ -60,6 +74,5 @@ class LaporanKeuanganService extends AbstractService
     private function createNeracaLajurPerusahaanDagangMetodeLabaRugi($idPerusahaan, $periode) {
         //sumber data berasal dari neraca saldo dan jurnal penyesuaian
     }
-
 
 }
