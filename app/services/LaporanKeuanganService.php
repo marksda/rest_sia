@@ -57,9 +57,15 @@ class LaporanKeuanganService extends AbstractService
 
     /**
 	 * Creating a new neraca lajur / kertas kerja metode Ikhtisar laba rugi
-     * kertas kerja dibuat dengan cara :
-     * 1. memindahkan data sumber neraca saldo ke dalam kolom neraca saldo pada kertas kerja
-     * 2. memindahkan data sumber jurnal penyesuaian ke dalam kolom 
+     * neraca lajur dibuat dengan cara :
+     * 1. memindahkan data sumber 'neraca saldo' ke dalam 'kolom neraca saldo' pada neraca lajur
+     * 2. memindahkan data sumber 'jurnal penyesuaian' ke dalam 'kolom jurnal penyesuaian' pada neraca lajur
+     *    ada 2 hal yang harus diperhatikan dalam memindahkan jurnal penyesuaian kedalam neraca lajur:
+     *    1. apabila nama akun dalam jurnal penyesuaian sudah ada dalam neraca lajur maka cukup menuliskan
+     *       saldo akun debet atau kredit pada kolom jurnal penyesuaian dalam neraca lajur.
+     *    2. apabila nama akun dalam jurnal penyesuaian belum ada pada neraca lajur maka nama akun tersebut
+     *       harus dituliskan pada kolom nama akun dalam neraca lajur baru kemudian mengisi saldo akun debet
+     *       atau kredit pada kolom jurnal penyesuaian dalam neraca lajur.
 	 *
 	 * @param json $idPerusahaan
      * @param int $periode 
