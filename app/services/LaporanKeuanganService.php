@@ -66,6 +66,7 @@ class LaporanKeuanganService extends AbstractService
      *    2. apabila nama akun dalam jurnal penyesuaian belum ada pada neraca lajur maka nama akun tersebut
      *       harus dituliskan pada kolom nama akun dalam neraca lajur baru kemudian mengisi saldo akun debet
      *       atau kredit pada kolom jurnal penyesuaian dalam neraca lajur.
+     * 3. mengisi kolom neraca saldo disesuaikan dalam neraca lajur.
 	 *
 	 * @param json $idPerusahaan
      * @param int $periode 
