@@ -62,8 +62,9 @@ class JurnalService extends AbstractService
 						'conditions' => 'akun = :idAkun: AND perusahaan = :idPerusahaan:',
 						'bind'       => [
 							'idAkun' => $itemJurnal->akun->id,						
-							'perusahaan' => $jurnalData->perusahaan->id
-						]
+							'perusahaan' => $jurnalData->perusahaan->id,
+						],
+						'order' => 'tanggal DESC'
 					]
 				);
 

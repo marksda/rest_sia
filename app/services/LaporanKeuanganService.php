@@ -21,7 +21,6 @@ class LaporanKeuanganService extends AbstractService
      * @param int $periode 
 	 */
     public function createNeracaSaldo($idPerusahaan, $periode) {
-        //sumber data berasal dari rekening/akun buku besar
         createNeracaSaldoMetodeIkhtiarLabaRugi($idPerusahaan, $periode);
     }
 
