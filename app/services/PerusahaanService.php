@@ -87,6 +87,15 @@ class PerusahaanService extends AbstractService
 				$this->db->rollback();
 				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
 			}
+
+			$sqlCreateTablePartition = "CREATE TABLE transaksi.buku_besar_".$id." PARTITION OF transaksi.tbl_buku_besar FOR VALUES IN ('".$id."')";
+			
+			$success = $this->db->execute($sqlCreateTablePartition);
+
+			if(false === $success) {
+				$this->db->rollback();
+				throw new ServiceException('Unable to create table partition', self::ERROR_UNABLE_UPDATE_ITEM);
+			}
 			
 			$this->db->commit();
         } catch (\PDOException $e) {
@@ -221,6 +230,13 @@ class PerusahaanService extends AbstractService
 				$this->db->rollback();
 				throw new ServiceException('Unable to delete table partition', self::ERROR_UNABLE_DELETE_ITEM);
 			}
+
+			$sqlDropTablePartition = "DROP TABLE public.buku_besar".$perusahaanId." CASCADE";			
+			$success = $this->db->execute($sqlDropTablePartition);
+			if(false === $success) {
+				$this->db->rollback();
+				throw new ServiceException('Unable to delete table partition', self::ERROR_UNABLE_DELETE_ITEM);
+			}	
 
 			$sqlDropTablePartition = "DROP TABLE public.akun_".$perusahaanId." CASCADE";			
 			$success = $this->db->execute($sqlDropTablePartition);

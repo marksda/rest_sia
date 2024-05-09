@@ -3,6 +3,7 @@
 namespace MyApp\Services;
 
 use MyApp\Models\Jurnal;
+use MyApp\Models\BukuBesar;
 use Phalcon\Encryption\Security\Random;
 
 class JurnalService extends AbstractService
@@ -15,10 +16,14 @@ class JurnalService extends AbstractService
 	 */
     public function createJurnal($jurnalData)
     {
+		$this->db->begin();
         try {
             $random = new Random();
             $jurnal = new Jurnal();
-            $result = $jurnal->setId($random->base58(12))
+
+			//insert row to jurnal
+			$idJurnal = $random->base58(12);
+            $result = $jurnal->setId($idJurnal)
 			               ->setKeterangan($jurnalData->keterangan)
                            ->setTanggal($jurnalData->tanggal)
 						   ->setJenis_jurnal($jurnalData->jenis_jurnal)
@@ -30,7 +35,13 @@ class JurnalService extends AbstractService
 			if (!$result) {
 				throw new ServiceException('Unable to create Jurnal', self::ERROR_UNABLE_CREATE_ITEM);
 			}
-        } catch (PDOException $e) {
+
+			
+			$bukuBesar = new BukuBesar();
+
+			$this->db->commit();
+        } catch (\PDOException $e) {
+			$this->db->rollback();
             if ($e->getCode() == 23505) {
 				throw new ServiceException('Jurnal already exists', self::ERROR_ALREADY_EXISTS, $e);
 			} 
