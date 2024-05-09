@@ -38,6 +38,18 @@ class JurnalService extends AbstractService
 				throw new ServiceException('Unable to create Jurnal', self::ERROR_UNABLE_CREATE_ITEM);
 			}
 
+			$keteranganPostingBukuBesar = "";
+
+			switch ($jurnalData->jenis_jurnal) {
+				case 'value':
+					# code...
+					break;
+				
+				default:
+					# code...
+					break;
+			}
+
 			$daftarItemJurnal = $jurnalData->daftarItemJurnal;
 
 			//insert detail jurnal dan posting ke buku besar
@@ -92,7 +104,7 @@ class JurnalService extends AbstractService
 						->setPerusahaan($jurnalData->perusahaan->id)
 						->setAkun($itemJurnal->akun->id)
 						->setTanggal($jurnalData->tanggal)
-						->setKeterangan("posting")
+						->setKeterangan($keteranganPostingBukuBesar)
 						->setDebet_kredit_nilai($itemJurnal->debet_kredit)
 						->setNilai($itemJurnal->nilai)
 						->setDebet_kredit_saldo($jenisDebetKredit)
