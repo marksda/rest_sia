@@ -18,8 +18,8 @@ class HakAksesService extends AbstractService
     {
         try {
             $random = new Random();
-            $HakAkses = new HakAkses();
-            $result = $HakAkses->setId($random->base58(4))
+            $hakAkses = new HakAkses();
+            $result = $hakAkses->setId($random->base58(4))
 			               ->setNama($hakAksesData->nama)
                            ->setModul($hakAksesData->nama)
 			               ->create();

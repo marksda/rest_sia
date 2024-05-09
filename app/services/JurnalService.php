@@ -41,12 +41,38 @@ class JurnalService extends AbstractService
 			$keteranganPostingBukuBesar = "";
 
 			switch ($jurnalData->jenis_jurnal) {
-				case 'value':
-					# code...
+				case '01':
+					$keteranganPostingBukuBesar = "";
 					break;
-				
+				case '02':
+					$keteranganPostingBukuBesar = "";
+					break;
+				case '03':
+					$keteranganPostingBukuBesar = "";
+					break;
+				case '04':
+					$keteranganPostingBukuBesar = "";
+					break;
+				case '05':
+					$keteranganPostingBukuBesar = "";
+					break;
+				case '06':
+					$keteranganPostingBukuBesar = "";
+					break;
+				case '07':
+					$keteranganPostingBukuBesar = "";
+					break;
+				case '08':
+					$keteranganPostingBukuBesar = "";
+					break;
+				case '09':
+					$keteranganPostingBukuBesar = "";
+					break;
+				case '10':
+					$keteranganPostingBukuBesar = "";
+					break;
 				default:
-					# code...
+					$keteranganPostingBukuBesar = "posting";
 					break;
 			}
 
@@ -54,7 +80,7 @@ class JurnalService extends AbstractService
 
 			//insert detail jurnal dan posting ke buku besar
 			foreach ($daftarItemJurnal as $itemJurnal) {
-				//insert item jurnal
+				//insert item detail jurnal
 				$detailJurnal = new DetailJurnal();
 				$result = $detailJurnal->setJurnal($idJurnal)
 			               ->setPerusahaan($itemJurnal->perusahaan->id)
@@ -79,42 +105,62 @@ class JurnalService extends AbstractService
 						'order' => 'tanggal DESC'
 					]
 				);
+				
+				$bukuBesar = new BukuBesar();
 
-				$saldoAkhir = 0.00;
-				$jenisDebetKredit = null;
-
-				if($lastSaldoAkunBukuBesar->getDebet_kredit_saldo() == $itemJurnal->debet_kredit) {
-					$jenisDebetKredit = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
-					$saldoAkhir = $lastSaldoAkunBukuBesar->setSaldo() + $itemJurnal->nilai;
+				if(!$lastSaldoAkunBukuBesar) {
+					$result = $bukuBesar->setJurnal($idJurnal)
+							->setPerusahaan($jurnalData->perusahaan->id)
+							->setAkun($itemJurnal->akun->id)
+							->setTanggal($jurnalData->tanggal)
+							->setKeterangan($keteranganPostingBukuBesar)
+							->setDebet_kredit_nilai($itemJurnal->debet_kredit)
+							->setNilai($itemJurnal->nilai)
+							->setDebet_kredit_saldo($itemJurnal->debet_kredit)
+							->setSaldo($itemJurnal->nilai)
+							->create();
+					
+					if (!$result) {
+						$this->db->rollback();
+						throw new ServiceException('Unable to create detailJurnal', self::ERROR_UNABLE_CREATE_ITEM);
+					}
 				}
 				else {
-					$saldoAkhir = $lastSaldoAkunBukuBesar->setSaldo();
-					if($saldoAkhir >= $itemJurnal->nilai) {
+					$saldoAkhir = 0.00;
+					$jenisDebetKredit = true;
+
+					if($lastSaldoAkunBukuBesar->getDebet_kredit_saldo() == $itemJurnal->debet_kredit) {
 						$jenisDebetKredit = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
-						$saldoAkhir = $saldoAkhir - $itemJurnal->nilai;
+						$saldoAkhir = $lastSaldoAkunBukuBesar->setSaldo() + $itemJurnal->nilai;
 					}
 					else {
-						$jenisDebetKredit = $itemJurnal->debet_kredit;
-						$saldoAkhir = $itemJurnal->nilai - $saldoAkhir;
+						$saldoAkhir = $lastSaldoAkunBukuBesar->setSaldo();
+						if($saldoAkhir >= $itemJurnal->nilai) {
+							$jenisDebetKredit = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
+							$saldoAkhir = $saldoAkhir - $itemJurnal->nilai;
+						}
+						else {
+							$jenisDebetKredit = $itemJurnal->debet_kredit;
+							$saldoAkhir = $itemJurnal->nilai - $saldoAkhir;
+						}
 					}
-				}
 
-				$bukuBesar = new BukuBesar();
-				$result = $bukuBesar->setJurnal($idJurnal)
-						->setPerusahaan($jurnalData->perusahaan->id)
-						->setAkun($itemJurnal->akun->id)
-						->setTanggal($jurnalData->tanggal)
-						->setKeterangan($keteranganPostingBukuBesar)
-						->setDebet_kredit_nilai($itemJurnal->debet_kredit)
-						->setNilai($itemJurnal->nilai)
-						->setDebet_kredit_saldo($jenisDebetKredit)
-						->setSaldo($saldoAkhir)
-						->create();
-				
-				if (!$result) {
-					$this->db->rollback();
-					throw new ServiceException('Unable to create detailJurnal', self::ERROR_UNABLE_CREATE_ITEM);
-				}
+					$result = $bukuBesar->setJurnal($idJurnal)
+							->setPerusahaan($jurnalData->perusahaan->id)
+							->setAkun($itemJurnal->akun->id)
+							->setTanggal($jurnalData->tanggal)
+							->setKeterangan($keteranganPostingBukuBesar)
+							->setDebet_kredit_nilai($itemJurnal->debet_kredit)
+							->setNilai($itemJurnal->nilai)
+							->setDebet_kredit_saldo($jenisDebetKredit)
+							->setSaldo($saldoAkhir)
+							->create();
+					
+					if (!$result) {
+						$this->db->rollback();
+						throw new ServiceException('Unable to create detailJurnal', self::ERROR_UNABLE_CREATE_ITEM);
+					}
+				}			
 		
 			}
 			
@@ -292,7 +338,7 @@ class JurnalService extends AbstractService
             // }
 
 			return $daftarJurnal->toArray(); 
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
     }
