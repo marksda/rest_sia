@@ -3,6 +3,7 @@
 namespace MyApp\Services;
 
 use MyApp\Models\Jurnal;
+use MyApp\Models\DetailJurnal;
 use MyApp\Models\BukuBesar;
 use Phalcon\Encryption\Security\Random;
 
@@ -24,26 +25,91 @@ class JurnalService extends AbstractService
 			//insert row to jurnal
 			$idJurnal = $random->base58(12);
             $result = $jurnal->setId($idJurnal)
-			               ->setKeterangan($jurnalData->keterangan)
-                           ->setTanggal($jurnalData->tanggal)
-						   ->setJenis_jurnal($jurnalData->jenis_jurnal)
-						   ->setPerusahaan($jurnalData->perusahaan->id)
-						   ->setOffice_store_outlet($jurnalData->office_store_outlet->id)
-						   ->setRef_bukti($jurnalData->ref_bukti)
-			               ->create();
+						->setKeterangan($jurnalData->keterangan)
+						->setTanggal($jurnalData->tanggal)
+						->setJenis_jurnal($jurnalData->jenis_jurnal)
+						->setPerusahaan($jurnalData->perusahaan->id)
+						->setOffice_store_outlet($jurnalData->office_store_outlet->id)
+						->setRef_bukti($jurnalData->ref_bukti)
+						->create();
             
 			if (!$result) {
+				$this->db->rollback();
 				throw new ServiceException('Unable to create Jurnal', self::ERROR_UNABLE_CREATE_ITEM);
 			}
 
-			
-			$bukuBesar = new BukuBesar();
+			$daftarItemJurnal = $jurnalData->daftarItemJurnal;
 
+			//insert detail jurnal dan posting ke buku besar
+			foreach ($daftarItemJurnal as $itemJurnal) {
+				//insert item jurnal
+				$detailJurnal = new DetailJurnal();
+				$result = $detailJurnal->setJurnal($idJurnal)
+			               ->setPerusahaan($itemJurnal->perusahaan->id)
+                           ->setAkun($itemJurnal->akun->id)
+                           ->setDebet_kredit($itemJurnal->debet_kredit)
+                           ->setNilai($itemJurnal->nilai)
+			               ->create();
+            
+				if (!$result) {
+					$this->db->rollback();
+					throw new ServiceException('Unable to create detailJurnal', self::ERROR_UNABLE_CREATE_ITEM);
+				}
+
+				//insert posting buku besar
+				$lastSaldoAkunBukuBesar = BukuBesar::findFirst(
+					[
+						'conditions' => 'akun = :idAkun: AND perusahaan = :idPerusahaan:',
+						'bind'       => [
+							'idAkun' => $itemJurnal->akun->id,						
+							'perusahaan' => $jurnalData->perusahaan->id
+						]
+					]
+				);
+
+				$saldoAkhir = 0.00;
+				$jenisDebetKredit = null;
+
+				if($lastSaldoAkunBukuBesar->getDebet_kredit_saldo() == $itemJurnal->debet_kredit) {
+					$jenisDebetKredit = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
+					$saldoAkhir = $lastSaldoAkunBukuBesar->setSaldo() + $itemJurnal->nilai;
+				}
+				else {
+					$saldoAkhir = $lastSaldoAkunBukuBesar->setSaldo();
+					if($saldoAkhir >= $itemJurnal->nilai) {
+						$jenisDebetKredit = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
+						$saldoAkhir = $saldoAkhir - $itemJurnal->nilai;
+					}
+					else {
+						$jenisDebetKredit = $itemJurnal->debet_kredit;
+						$saldoAkhir = $itemJurnal->nilai - $saldoAkhir;
+					}
+				}
+
+				$bukuBesar = new BukuBesar();
+				$result = $bukuBesar->setJurnal($idJurnal)
+						->setPerusahaan($jurnalData->perusahaan->id)
+						->setAkun($itemJurnal->akun->id)
+						->setTanggal($jurnalData->tanggal)
+						->setKeterangan("posting")
+						->setDebet_kredit_nilai($itemJurnal->debet_kredit)
+						->setNilai($itemJurnal->nilai)
+						->setDebet_kredit_saldo($jenisDebetKredit)
+						->setSaldo($saldoAkhir)
+						->create();
+				
+				if (!$result) {
+					$this->db->rollback();
+					throw new ServiceException('Unable to create detailJurnal', self::ERROR_UNABLE_CREATE_ITEM);
+				}
+		
+			}
+			
 			$this->db->commit();
         } catch (\PDOException $e) {
 			$this->db->rollback();
             if ($e->getCode() == 23505) {
-				throw new ServiceException('Jurnal already exists', self::ERROR_ALREADY_EXISTS, $e);
+				throw new ServiceException('Item jurnal atau buku besar already exists', self::ERROR_ALREADY_EXISTS, $e);
 			} 
 			else if ($e->getCode() == 23503){
 				throw new ServiceException('Foreign key error', self::ERROR_FOREIGN_KEY_VIOLATION, $e);
