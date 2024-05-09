@@ -94,59 +94,83 @@ class BukuBesarService extends AbstractService
     /**
 	 * Updating item buku besar
 	 *
-     * @param string $bukuBesarIdLama
+     * @param string $jurnalIdLama
+     * @param string $perusahaanIdLama
+     * @param string $akunIdLama
 	 * @param json $bukuBesarDataBaru
 	 */
-	public function updateBukuBesar($bukuBesarIdLama, $bukuBesarDataBaru)
+	public function updateBukuBesar($jurnalIdLama, $perusahaanIdLama, $akunIdLama, $bukuBesarDataBaru)
 	{
 		try {
 
             $bukuBesar = BukuBesar::findFirst(
 				[
-					'conditions' => 'id = :id:',
-					'bind'       => [
-						'id' => $bukuBesarIdLama
-					]
+					'conditions' => 'akun = :idAkun: AND jurnal = :idJurnal: AND perusahaan = :idPerusahaan:',
+                    'bind'       => [
+                        'idAkun' => $akunIdLama,	
+                        'idJurnal' => $jurnalIdLama,						
+                        'perusahaan' => $perusahaanIdLama,
+                    ]
 				]
 			);
 
 			if($bukuBesar == null) {
-				throw new ServiceException('Unable to update hak akses', self::ERROR_UNABLE_UPDATE_ITEM);
+				throw new ServiceException('Unable to update item nuku besar', self::ERROR_UNABLE_UPDATE_ITEM);
 			}		
 			
-			if($bukuBesarIdLama != $bukuBesarDataBaru->id) {
+			if($jurnalIdLama != $bukuBesarDataBaru->jurnal->id && 
+                    $perusahaanIdLama != $bukuBesarDataBaru->perusahaan->id &&
+                    $akunIdLama != $bukuBesarDataBaru->akun->id) {
 				$sql     = "
 				UPDATE 
-					public.tbl_hak_akses
+					transaksi.tbl_buku_besar
 				SET 
-					id = :idBaru, 
-					nama = :nama,
-                    modul = :modul
+					jurnal = :idJurnalBaru, 
+					perusahaan = :idPerusahaanBaru,
+                    akun = :idAkunBaru,
+                    tanggal = :tanggal, 
+					keterangan = :keterangan,
+                    debet_kredit_nilai = :dbn,
+                    nilai = :nilai, 
+					debet_kredit_saldo = :dbs,
+                    saldo = :saldo,
 				WHERE
-					id = :idLama
+					akun = :idAkunLama AND jurnal = :idJurnalLama AND perusahaan = :idPerusahaanLama
 				";
 
 				$success = $this->db->execute(
 					$sql,
 					[
-						'idBaru' => $bukuBesarDataBaru->id,
-						'nama' => $bukuBesarDataBaru->nama,
-                        'modul' => $bukuBesarDataBaru->modul->id,
-						'idLama' => $bukuBesarIdLama
+						'idJurnalBaru' => $bukuBesarDataBaru->jurnal->id,
+						'idPerusahaanBaru' => $bukuBesarDataBaru->perusahaan->id,
+                        'idAkunBaru' => $bukuBesarDataBaru->akun->id,
+						'tanggal' => $bukuBesarDataBaru->tanggal,
+                        'keterangan' => $bukuBesarDataBaru->keterangan,
+                        'dbn' => $bukuBesarDataBaru->debet_kredit_nilai,
+                        'nilai' => $bukuBesarDataBaru->nilai,
+                        'dbs' => $bukuBesarDataBaru->debet_kredit_saldo,
+                        'saldo' => $bukuBesarDataBaru->saldo,
+                        'idJurnalLama' => $jurnalIdLama,
+                        'idPerusahaanLama' => $perusahaanIdLama,
+                        'idAkunLama' => $akunIdLama
 					]
 				);
 
 				if(false === $success) {
-					throw new ServiceException('Unable to update hak akses', self::ERROR_UNABLE_UPDATE_ITEM);
+					throw new ServiceException('Unable to update item buku besar', self::ERROR_UNABLE_UPDATE_ITEM);
 				}
 			}
 			else {
-				$bukuBesar->setNama($bukuBesarDataBaru->nama);
-                $bukuBesar->setModul($bukuBesarDataBaru->modul->id);
+				$bukuBesar->setTanggal($bukuBesarDataBaru->tanggal);
+                $bukuBesar->setKeterangan($bukuBesarDataBaru->keterangan);
+                $bukuBesar->setDebet_kredit_nilai($bukuBesarDataBaru->debet_kredit_nilai);
+                $bukuBesar->setNilai($bukuBesarDataBaru->nilai);
+                $bukuBesar->setDebet_kredit_saldo($bukuBesarDataBaru->debet_kredit_saldo);
+                $bukuBesar->setSaldo($bukuBesarDataBaru->saldo);
 				$result = $bukuBesar->update();
 
 				if ( false === $result) {
-					throw new ServiceException('Unable to update hak akses', self::ERROR_UNABLE_UPDATE_ITEM);
+					throw new ServiceException('Unable to update item buku besar', self::ERROR_UNABLE_UPDATE_ITEM);
 				}
 			}
 		} catch (\PDOException $e) {
@@ -157,26 +181,30 @@ class BukuBesarService extends AbstractService
     /**
 	 * Delete an existing item buku besar
 	 *
-	 * @param int $bukuBesarId
+	 * @param string $jurnalIdLama
+     * @param string $perusahaanIdLama
+     * @param string $akunIdLama
 	 */
-	public function deleteBukuBesar($bukuBesarId)
+	public function deleteBukuBesar($jurnalIdLama, $perusahaanIdLama, $akunIdLama)
 	{
 		try {
 			$bukuBesar = BukuBesar::findFirst(
 				[
-					'conditions' => 'id = :id:',
-					'bind'       => [
-						'id' => $bukuBesarId
-					]
+					'conditions' => 'akun = :idAkun: AND jurnal = :idJurnal: AND perusahaan = :idPerusahaan:',
+                    'bind'       => [
+                        'idAkun' => $akunIdLama,	
+                        'idJurnal' => $jurnalIdLama,						
+                        'perusahaan' => $perusahaanIdLama,
+                    ]
 				]
 			);
 
 			if($bukuBesar == null) {
-				throw new ServiceException('Hak akses not found', self::ERROR_ITEM_NOT_FOUND);
+				throw new ServiceException('Item buku besar not found', self::ERROR_ITEM_NOT_FOUND);
 			}
 			
 			if (false === $bukuBesar->delete()) {
-				throw new ServiceException('Unable to delete hak akses', self::ERROR_UNABLE_DELETE_ITEM);
+				throw new ServiceException('Unable to delete item buku besar', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
@@ -202,15 +230,7 @@ class BukuBesarService extends AbstractService
 				return [];
 			}
 
-            $i = 0;
-			$hasil = array();
-            foreach ($daftarBukuBesar as $bukuBesar) {
-                $bukuBesar->setModul($bukuBesar->getRelated('detail_modul'));
-				$hasil[$i] = $bukuBesar;
-				$i++;
-            }
-
-			return $hasil; 
+			return $daftarBukuBesar->toArray(); 
 		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}

@@ -16,6 +16,7 @@ use MyApp\Controllers\ModulController;
 use MyApp\Controllers\JurnalController;
 use MyApp\Controllers\AkunController;
 use MyApp\Controllers\DetailJurnalController;
+use MyApp\Controllers\BukuBesarController;
 
 
 $path = $app->request->getURI(true);
@@ -239,6 +240,21 @@ switch ($collection) {
             ->post('/add', 'addAction')
             ->put('/{idJurnalLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idAkunLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
             ->delete('/{idJurnalLama:[a-zA-Z0-9\_\-]+}/{idPerusahaanLama:[a-zA-Z0-9\_\-]+}/{idAkunLama:[a-zA-Z0-9\_\-]+}', 'deleteAction')
+            ;
+
+        $app->mount($akunCollection);
+
+        break;
+    case 'buku_besar':
+        $bukuBesarCollection = new MicroCollection();
+
+        $bukuBesarCollection
+            ->setHandler(BukuBesarController::class, true)
+            ->setPrefix('/api/buku_besar')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{jurnalIdLama:[a-zA-Z0-9\_\-]+}/{$perusahaanIdLama:[a-zA-Z0-9\_\-]+}/{$akunIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{jurnalIdLama:[a-zA-Z0-9\_\-]+}/{$perusahaanIdLama:[a-zA-Z0-9\_\-]+}/{$akunIdLama:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($akunCollection);

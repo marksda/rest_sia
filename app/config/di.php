@@ -18,6 +18,7 @@ use MyApp\Services\ModulService;
 use MyApp\Services\JurnalService;
 use MyApp\Services\AkunService;
 use MyApp\Services\DetailJurnalService;
+use MyApp\Services\BukuBesarService;
 
 
 $di = new FactoryDefault();
@@ -118,6 +119,11 @@ $di->setShared(
 $di->setShared(
     'detailJurnalService',
     DetailJurnalService::class
+);
+
+$di->setShared(
+    'bukuBesarService',
+    BukuBesarService::class
 );
 
 return $di;
