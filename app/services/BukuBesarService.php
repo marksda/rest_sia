@@ -11,6 +11,8 @@ class BukuBesarService extends AbstractService
 
     /**
 	 * Creating a new item buku besar
+     * sumber data berasal dari neraca / neraca saldo penutup
+     * periode sebelumnya dan jurnal khusus.
 	 *
 	 * @param json $bukuBesarData
 	 */
