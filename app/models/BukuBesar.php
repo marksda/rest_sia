@@ -15,7 +15,7 @@ class Jurnal extends Model
     protected $nilai;
     protected $debet_kredit_saldo;
     protected $saldo;
-    protected $jurnal;
+    protected $detail_jurnal;
     protected $neraca; 
     protected $ref;
 
@@ -261,6 +261,26 @@ class Jurnal extends Model
     public function setRef($ref)
     {
         $this->ref = $ref;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of detail_jurnal
+     */ 
+    public function getDetail_jurnal()
+    {
+        return $this->detail_jurnal;
+    }
+
+    /**
+     * Set the value of detail_jurnal
+     *
+     * @return  self
+     */ 
+    public function setDetail_jurnal($detail_jurnal)
+    {
+        $this->detail_jurnal = $detail_jurnal;
 
         return $this;
     }

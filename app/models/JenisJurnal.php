@@ -8,6 +8,7 @@ class JenisJurnal extends Model
 {
     protected $id; 
     protected $nama; 
+    protected $singkatan;
     protected $keterangan;
 
     public function initialize()
@@ -72,6 +73,26 @@ class JenisJurnal extends Model
     public function setKeterangan($keterangan)
     {
         $this->keterangan = $keterangan;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of singkatan
+     */ 
+    public function getSingkatan()
+    {
+        return $this->singkatan;
+    }
+
+    /**
+     * Set the value of singkatan
+     *
+     * @return  self
+     */ 
+    public function setSingkatan($singkatan)
+    {
+        $this->singkatan = $singkatan;
 
         return $this;
     }

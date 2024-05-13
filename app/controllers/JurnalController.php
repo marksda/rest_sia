@@ -39,22 +39,22 @@ class JurnalController extends Controller
 	 * @param string $idJenisJurnalLama
      * 
      */
-    public function updateAction($idLama, $idPerusahaanLama)
-    {
-        $data = $this->request->getJsonRawBody();
+    // public function updateAction($idLama, $idPerusahaanLama)
+    // {
+    //     $data = $this->request->getJsonRawBody();
         
-        try {
-            $this->jurnalService->updateJurnal($idLama, $idPerusahaanLama, $data);
-        } catch (ServiceException $e) {
-            switch ($e->getCode()) {
-                case AbstractService::ERROR_ALREADY_EXISTS:
-                case AbstractService::ERROR_UNABLE_CREATE_ITEM:
-                    throw new Http422Exception($e->getMessage(), $e->getCode(), $e);
-                default:
-                    throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
-            }
-        }
-    }
+    //     try {
+    //         $this->jurnalService->updateJurnal($idLama, $idPerusahaanLama, $data);
+    //     } catch (ServiceException $e) {
+    //         switch ($e->getCode()) {
+    //             case AbstractService::ERROR_ALREADY_EXISTS:
+    //             case AbstractService::ERROR_UNABLE_CREATE_ITEM:
+    //                 throw new Http422Exception($e->getMessage(), $e->getCode(), $e);
+    //             default:
+    //                 throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
+    //         }
+    //     }
+    // }
 
     /**
      * Delete an existing jurnal
@@ -63,22 +63,22 @@ class JurnalController extends Controller
 	 * @param string $idPerusahaanLama
 	 * @param string $idJenisJurnalLama
      */
-    public function deleteAction($idLama, $idPerusahaanLama)
-    {
-        try {
-            $this->jurnalService->deleteJurnal($idLama, $idPerusahaanLama);
-        } catch (ServiceException $e) {
-            switch ($e->getCode()) {
-                case AbstractService::ERROR_UNABLE_DELETE_ITEM:
-                case AbstractService::ERROR_ITEM_NOT_FOUND:
-                    throw new Http422Exception($e->getMessage(), $e->getCode(), $e);
-                case AbstractService::ERROR_FOREIGN_KEY_VIOLATION:
-                    throw new Http422Exception($e->getMessage(), $e->getCode(), $e);    
-                default:
-                    throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
-            }
-        }
-    }
+    // public function deleteAction($idLama, $idPerusahaanLama)
+    // {
+    //     try {
+    //         $this->jurnalService->deleteJurnal($idLama, $idPerusahaanLama);
+    //     } catch (ServiceException $e) {
+    //         switch ($e->getCode()) {
+    //             case AbstractService::ERROR_UNABLE_DELETE_ITEM:
+    //             case AbstractService::ERROR_ITEM_NOT_FOUND:
+    //                 throw new Http422Exception($e->getMessage(), $e->getCode(), $e);
+    //             case AbstractService::ERROR_FOREIGN_KEY_VIOLATION:
+    //                 throw new Http422Exception($e->getMessage(), $e->getCode(), $e);    
+    //             default:
+    //                 throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
+    //         }
+    //     }
+    // }
 
     /**
      * Returns jurnal list

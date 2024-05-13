@@ -51,28 +51,28 @@ class JurnalService extends AbstractService
 					$keteranganPostingBukuBesar = "";
 					break;
 				case '04':
-					$keteranganPostingBukuBesar = "";
+					$keteranganPostingBukuBesar = $jurnalData->keterangan;
 					break;
 				case '05':
-					$keteranganPostingBukuBesar = "";
+					$keteranganPostingBukuBesar = $jurnalData->keterangan;
 					break;
 				case '06':
-					$keteranganPostingBukuBesar = "";
+					$keteranganPostingBukuBesar = $jurnalData->keterangan;
 					break;
 				case '07':
-					$keteranganPostingBukuBesar = "";
+					$keteranganPostingBukuBesar = $jurnalData->keterangan;
 					break;
 				case '08':
-					$keteranganPostingBukuBesar = "";
+					$keteranganPostingBukuBesar = $jurnalData->keterangan;
 					break;
 				case '09':
-					$keteranganPostingBukuBesar = "";
+					$keteranganPostingBukuBesar = $jurnalData->keterangan;
 					break;
 				case '10':
-					$keteranganPostingBukuBesar = "";
+					$keteranganPostingBukuBesar = $jurnalData->keterangan;
 					break;
 				default:
-					$keteranganPostingBukuBesar = "posting";
+					$keteranganPostingBukuBesar = "Posting";
 					break;
 			}
 
@@ -82,12 +82,14 @@ class JurnalService extends AbstractService
 			foreach ($daftarItemJurnal as $itemJurnal) {
 				//insert item detail jurnal
 				$detailJurnal = new DetailJurnal();
-				$result = $detailJurnal->setJurnal($idJurnal)
-			               ->setPerusahaan($itemJurnal->perusahaan->id)
-                           ->setAkun($itemJurnal->akun->id)
-                           ->setDebet_kredit($itemJurnal->debet_kredit)
-                           ->setNilai($itemJurnal->nilai)
-			               ->create();
+				$idDetailJurnal = $random->base58(12);
+				$result = $detailJurnal->setId($idDetailJurnal)
+							->setJurnal($idJurnal)
+							->setPerusahaan($itemJurnal->perusahaan->id)
+							->setAkun($itemJurnal->akun->id)
+							->setDebet_kredit($itemJurnal->debet_kredit)
+							->setNilai($itemJurnal->nilai)
+							->create();
             
 				if (!$result) {
 					$this->db->rollback();
@@ -109,15 +111,17 @@ class JurnalService extends AbstractService
 				$bukuBesar = new BukuBesar();
 
 				if(!$lastSaldoAkunBukuBesar) {
-					$result = $bukuBesar->setJurnal($idJurnal)
+					$result = $bukuBesar->setId($random->base58(12))
 							->setPerusahaan($jurnalData->perusahaan->id)
-							->setAkun($itemJurnal->akun->id)
 							->setTanggal($jurnalData->tanggal)
 							->setKeterangan($keteranganPostingBukuBesar)
+							->setAkun($itemJurnal->akun->id)
 							->setDebet_kredit_nilai($itemJurnal->debet_kredit)
 							->setNilai($itemJurnal->nilai)
 							->setDebet_kredit_saldo($itemJurnal->debet_kredit)
 							->setSaldo($itemJurnal->nilai)
+							->setDetail_jurnal($idDetailJurnal)
+							->setRef($jurnalData->jenis_jurnal->singkatan)
 							->create();
 					
 					if (!$result) {
@@ -145,15 +149,17 @@ class JurnalService extends AbstractService
 						}
 					}
 
-					$result = $bukuBesar->setJurnal($idJurnal)
+					$result = $bukuBesar->setId($random->base58(12))
 							->setPerusahaan($jurnalData->perusahaan->id)
-							->setAkun($itemJurnal->akun->id)
 							->setTanggal($jurnalData->tanggal)
 							->setKeterangan($keteranganPostingBukuBesar)
+							->setAkun($itemJurnal->akun->id)
 							->setDebet_kredit_nilai($itemJurnal->debet_kredit)
 							->setNilai($itemJurnal->nilai)
 							->setDebet_kredit_saldo($jenisDebetKredit)
 							->setSaldo($saldoAkhir)
+							->setDetail_jurnal($idDetailJurnal)
+							->setRef($jurnalData->jenis_jurnal->singkatan)
 							->create();
 					
 					if (!$result) {
@@ -187,74 +193,74 @@ class JurnalService extends AbstractService
 	 * @param string $idJenisJurnalLama
 	 * @param json $jurnalDataBaru
 	 */
-	public function updateJurnal($idLama, $idPerusahaanLama, $jurnalDataBaru)
-	{
-		try {
-            $jurnal = Jurnal::findFirst(
-				[
-					'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
-					'bind'       => [
-						'id' => $idLama,					
-						'perusahaan' => $idPerusahaanLama
-					]
-				]
-			);
+	// public function updateJurnal($idLama, $idPerusahaanLama, $jurnalDataBaru)
+	// {
+	// 	try {
+    //         $jurnal = Jurnal::findFirst(
+	// 			[
+	// 				'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
+	// 				'bind'       => [
+	// 					'id' => $idLama,					
+	// 					'perusahaan' => $idPerusahaanLama
+	// 				]
+	// 			]
+	// 		);
 
-			if($jurnal == null) {
-				throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
-			}		
+	// 		if($jurnal == null) {
+	// 			throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
+	// 		}		
 			
-			if($idLama != $jurnalDataBaru->id && $idPerusahaanLama != $jurnalDataBaru->perusahaan) {
-				$sql     = "
-				UPDATE 
-					jurnal.tbl_Jurnal
-				SET 
-					id = :idBaru, 
-					keterangan = :keterangan,
-                    tanggal = :tanggal,
-					jenis_jurnal = : jenisJurnal,
-					perusahaan = :perusahaan,
-					office_store_outlet = :office,
-					ref_bukti = : refBukti
-				WHERE
-					id = :idLama AND perusahaan = :idPerusahaanLama
-				";
+	// 		if($idLama != $jurnalDataBaru->id && $idPerusahaanLama != $jurnalDataBaru->perusahaan) {
+	// 			$sql     = "
+	// 			UPDATE 
+	// 				jurnal.tbl_Jurnal
+	// 			SET 
+	// 				id = :idBaru, 
+	// 				keterangan = :keterangan,
+    //                 tanggal = :tanggal,
+	// 				jenis_jurnal = : jenisJurnal,
+	// 				perusahaan = :perusahaan,
+	// 				office_store_outlet = :office,
+	// 				ref_bukti = : refBukti
+	// 			WHERE
+	// 				id = :idLama AND perusahaan = :idPerusahaanLama
+	// 			";
 
-				$success = $this->db->execute(
-					$sql,
-					[
-						'idBaru' => $jurnalDataBaru->id,
-						'keterangan' => $jurnalDataBaru->keterangan,
-                        'tanggal' => $jurnalDataBaru->tanggal,
-						'jenisJurnal' => $jurnalDataBaru->jenis_jurnal,
-						'perusahaan' => $jurnalDataBaru->perusahaan->id,
-						'office' => $jurnalDataBaru->office_store_outlet->id,
-						'refBukti' => $jurnalDataBaru->ref_bukti,
-						'idLama' => $idLama,
-						'idPerusahaanLama' => $idPerusahaanLama
-					]
-				);
+	// 			$success = $this->db->execute(
+	// 				$sql,
+	// 				[
+	// 					'idBaru' => $jurnalDataBaru->id,
+	// 					'keterangan' => $jurnalDataBaru->keterangan,
+    //                     'tanggal' => $jurnalDataBaru->tanggal,
+	// 					'jenisJurnal' => $jurnalDataBaru->jenis_jurnal,
+	// 					'perusahaan' => $jurnalDataBaru->perusahaan->id,
+	// 					'office' => $jurnalDataBaru->office_store_outlet->id,
+	// 					'refBukti' => $jurnalDataBaru->ref_bukti,
+	// 					'idLama' => $idLama,
+	// 					'idPerusahaanLama' => $idPerusahaanLama
+	// 				]
+	// 			);
 
-				if(false === $success) {
-					throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
-				}
-			}
-			else {
-				$jurnal->setKeterangan($jurnalDataBaru->keterangan);
-                $jurnal->setTanggal($jurnalDataBaru->tanggal);
-				$jurnal->setJenis_jurnal($jurnalDataBaru->jenis_jurnal);
-				$jurnal->setOffice_store_outlet($jurnalDataBaru->office_store_outlet->id);
-				$jurnal->setRef_bukti($jurnalDataBaru->ref_bukti);
-				$result = $jurnal->update();
+	// 			if(false === $success) {
+	// 				throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
+	// 			}
+	// 		}
+	// 		else {
+	// 			$jurnal->setKeterangan($jurnalDataBaru->keterangan);
+    //             $jurnal->setTanggal($jurnalDataBaru->tanggal);
+	// 			$jurnal->setJenis_jurnal($jurnalDataBaru->jenis_jurnal);
+	// 			$jurnal->setOffice_store_outlet($jurnalDataBaru->office_store_outlet->id);
+	// 			$jurnal->setRef_bukti($jurnalDataBaru->ref_bukti);
+	// 			$result = $jurnal->update();
 
-				if ( false === $result) {
-					throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
-				}
-			}
-		} catch (\PDOException $e) {
-			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
-		}
-	}
+	// 			if ( false === $result) {
+	// 				throw new ServiceException('Unable to update jurnal', self::ERROR_UNABLE_UPDATE_ITEM);
+	// 			}
+	// 		}
+	// 	} catch (\PDOException $e) {
+	// 		throw new ServiceException($e->getMessage(), $e->getCode(), $e);
+	// 	}
+	// }
 
 	/**
 	 * Delete an existing jurnal
@@ -263,30 +269,30 @@ class JurnalService extends AbstractService
 	 * @param string $idPerusahaanLama
 	 * @param string $idJenisJurnalLama
 	 */
-	public function deleteJurnal($idLama, $idPerusahaanLama)
-	{
-		try {
-			$jurnal = Jurnal::findFirst(
-				[
-					'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
-					'bind'       => [
-						'id' => $idLama,						
-						'perusahaan' => $idPerusahaanLama
-					]
-				]
-			);
+	// public function deleteJurnal($idLama, $idPerusahaanLama)
+	// {
+	// 	try {
+	// 		$jurnal = Jurnal::findFirst(
+	// 			[
+	// 				'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
+	// 				'bind'       => [
+	// 					'id' => $idLama,						
+	// 					'perusahaan' => $idPerusahaanLama
+	// 				]
+	// 			]
+	// 		);
 
-			if($jurnal == null) {
-				throw new ServiceException('Jurnal not found', self::ERROR_ITEM_NOT_FOUND);
-			}
+	// 		if($jurnal == null) {
+	// 			throw new ServiceException('Jurnal not found', self::ERROR_ITEM_NOT_FOUND);
+	// 		}
 			
-			if (false === $jurnal->delete()) {
-				throw new ServiceException('Unable to delete jurnal', self::ERROR_UNABLE_DELETE_ITEM);
-			}
-		} catch (\PDOException $e) {
-			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
-		}
-	}
+	// 		if (false === $jurnal->delete()) {
+	// 			throw new ServiceException('Unable to delete jurnal', self::ERROR_UNABLE_DELETE_ITEM);
+	// 		}
+	// 	} catch (\PDOException $e) {
+	// 		throw new ServiceException($e->getMessage(), $e->getCode(), $e);
+	// 	}
+	// }
 
 	/**
 	 * Returns Jurnal list
