@@ -15,7 +15,7 @@ class NeracaSaldoService extends AbstractService
 	 *
 	 * @param json $jurnalData
 	 */
-    public function createNeracaSaldo($jurnalData)
+    public function createNeracaSaldo($idPerusahaan, $periodeAkuntansi)
     {
 		try {
 			$this->db->begin();
@@ -190,7 +190,7 @@ class NeracaSaldoService extends AbstractService
 	 *
 	 * @return array
 	 */
-    public function getNeracaSaldoList()
+    public function getNeracaSaldoList($idPerusahaan, $priodeAkuntansi)
     {
         try {
 			$daftarNeracaSaldo = NeracaSaldo::find(
