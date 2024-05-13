@@ -6,6 +6,7 @@ use Phalcon\Mvc\Model;
 
 class DetailJurnal extends Model
 {
+    protected $id;
     protected $jurnal; 
     protected $perusahaan; 
     protected $akun;
@@ -116,6 +117,25 @@ class DetailJurnal extends Model
         $this->nilai = $nilai;
 
         return $this;
+    }    
+
+    /**
+     * Get the value of id
+     */ 
+    public function getId()
+    {
+        return $this->id;
     }
-    
+
+    /**
+     * Set the value of id
+     *
+     * @return  self
+     */ 
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 }

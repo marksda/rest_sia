@@ -6,15 +6,18 @@ use Phalcon\Mvc\Model;
 
 class Jurnal extends Model
 {
-    protected $jurnal; 
+    protected $id; 
     protected $perusahaan; 
-    protected $akun;
     protected $tanggal; 
     protected $keterangan;
+    protected $akun;
     protected $debet_kredit_nilai; 
     protected $nilai;
     protected $debet_kredit_saldo;
     protected $saldo;
+    protected $jurnal;
+    protected $neraca; 
+    protected $ref;
 
     public function initialize()
     {
@@ -198,6 +201,66 @@ class Jurnal extends Model
     public function setSaldo($saldo)
     {
         $this->saldo = $saldo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of id
+     */ 
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set the value of id
+     *
+     * @return  self
+     */ 
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of neraca
+     */ 
+    public function getNeraca()
+    {
+        return $this->neraca;
+    }
+
+    /**
+     * Set the value of neraca
+     *
+     * @return  self
+     */ 
+    public function setNeraca($neraca)
+    {
+        $this->neraca = $neraca;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of ref
+     */ 
+    public function getRef()
+    {
+        return $this->ref;
+    }
+
+    /**
+     * Set the value of ref
+     *
+     * @return  self
+     */ 
+    public function setRef($ref)
+    {
+        $this->ref = $ref;
 
         return $this;
     }
