@@ -16,9 +16,11 @@ class DetailJurnalService extends AbstractService
 	 */
     public function createDetailJurnal($detailJurnalData)
     {		
+		
         try {
             $detailJurnal = new DetailJurnal();
-            $result = $detailJurnal->setId($random->base58(12))
+			$idDetailJurnal = $random->base58(12);
+            $result = $detailJurnal->setId($idDetailJurnal)
 							->setJurnal($detailJurnalData->jurnal->id)
 							->setPerusahaan($detailJurnalData->perusahaan->id)
 							->setAkun($detailJurnalData->akun->id)
@@ -29,7 +31,6 @@ class DetailJurnalService extends AbstractService
 			if (!$result) {
 				throw new ServiceException('Unable to create detailJurnal', self::ERROR_UNABLE_CREATE_ITEM);
 			}
-
         } catch (\PDOException $e) {
             if ($e->getCode() == 23505) {
 				throw new ServiceException('DetailJurnal already exists', self::ERROR_ALREADY_EXISTS, $e);

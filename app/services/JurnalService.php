@@ -17,8 +17,9 @@ class JurnalService extends AbstractService
 	 */
     public function createJurnal($jurnalData)
     {
-		$this->db->begin();
-        try {
+		try {
+			$this->db->begin();
+        
             $random = new Random();
             $jurnal = new Jurnal();
 
@@ -166,8 +167,7 @@ class JurnalService extends AbstractService
 						$this->db->rollback();
 						throw new ServiceException('Unable to create detailJurnal', self::ERROR_UNABLE_CREATE_ITEM);
 					}
-				}			
-		
+				}	
 			}
 			
 			$this->db->commit();
