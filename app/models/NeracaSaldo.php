@@ -4,7 +4,7 @@ namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
 
-class Jurnal extends Model
+class NeracaSaldo extends Model
 {
     protected $id; 
     protected $perusahaan;
