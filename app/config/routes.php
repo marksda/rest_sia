@@ -253,8 +253,8 @@ switch ($collection) {
             ->setPrefix('/api/buku_besar')
             ->get('/list', 'listAction')
             ->post('/add', 'addAction')
-            ->put('/{jurnalIdLama:[a-zA-Z0-9\_\-]+}/{$perusahaanIdLama:[a-zA-Z0-9\_\-]+}/{$akunIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
-            ->delete('/{jurnalIdLama:[a-zA-Z0-9\_\-]+}/{$perusahaanIdLama:[a-zA-Z0-9\_\-]+}/{$akunIdLama:[a-zA-Z0-9\_\-]+}', 'deleteAction')
+            // ->put('/{jurnalIdLama:[a-zA-Z0-9\_\-]+}/{$perusahaanIdLama:[a-zA-Z0-9\_\-]+}/{$akunIdLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            // ->delete('/{jurnalIdLama:[a-zA-Z0-9\_\-]+}/{$perusahaanIdLama:[a-zA-Z0-9\_\-]+}/{$akunIdLama:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
 
         $app->mount($akunCollection);
