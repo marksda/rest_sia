@@ -41,11 +41,11 @@ class NeracaSaldoService extends AbstractService
 					]
 				);
 
-				if(!$lastSaldoAkunBukuBesar) {
+				if(!$lastSaldoAkunBukuBesar) {	//tidak ada data transaksi pada buku besar
 					$this->db->rollback();
 					throw new ServiceException('Unable to create neraca saldo, tidak ada transaksi untuk priode ini', self::ERROR_UNABLE_CREATE_ITEM);
 				}
-				else {
+				else {	//ada data transaksi pada buku besar
 					$neracaSaldo   = new NeracaSaldo();
 					$random = new Random();
 					$idNeracaSaldo = $random->base58(12);
@@ -68,9 +68,26 @@ class NeracaSaldoService extends AbstractService
 						]
 					);
 
+					//insert data kedalam detail neraca saldo
+					$data = array();
+					$count = 0;
 					foreach($daftarSaldoAkunBukuBesar as $lastSaldoAkunBukuBesar) {
-
+						$data[] = $random->base58(12);	
+						$data[] = $neracaSaldoData->perusahaan->id;
+						$data[] = $idNeracaSaldo;
+						$data[] = $lastSaldoAkunBukuBesar->getAkun();
+						$data[] = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
+						$data[] = $lastSaldoAkunBukuBesar->getSaldo();
+						$data[] = time();
+						$count++;
 					}
+
+					$values = str_repeat('?,', 6) . '?';
+					$sqlInsertDetailNeracaSaldo = "INSERT INTO laporan.tbl_detail_neraca_saldo VALUES " .
+									str_repeat("($values),", $count - 1) . "($values)"; 
+
+					$stmt = $this->db->prepare($sqlInsertDetailNeracaSaldo);
+					$stmt->execute($data);
 				}
 			}
 			else {	//neraca saldo sudah ada

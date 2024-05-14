@@ -142,7 +142,7 @@ class JurnalService extends AbstractService
 						$saldoAkhir = $lastSaldoAkunBukuBesar->setSaldo() + $itemJurnal->nilai;
 					}
 					else {
-						$saldoAkhir = $lastSaldoAkunBukuBesar->setSaldo();
+						$saldoAkhir = $lastSaldoAkunBukuBesar->getSaldo();
 						if($saldoAkhir >= $itemJurnal->nilai) {
 							$jenisDebetKredit = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
 							$saldoAkhir = $saldoAkhir - $itemJurnal->nilai;
