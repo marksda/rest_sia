@@ -26,6 +26,7 @@ class DetailJurnalService extends AbstractService
 							->setAkun($detailJurnalData->akun->id)
 							->setDebet_kredit($detailJurnalData->debet_kredit)
 							->setNilai($detailJurnalData->nilai)
+							->setTanggal_insert(time())
 							->create();
             
 			if (!$result) {

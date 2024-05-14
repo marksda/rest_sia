@@ -32,6 +32,7 @@ class JurnalService extends AbstractService
 						->setPerusahaan($jurnalData->perusahaan->id)
 						->setOffice_store_outlet($jurnalData->office_store_outlet->id)
 						->setRef_bukti($jurnalData->ref_bukti)
+						->setTanggal_insert(time())
 						->create();
             
 			if (!$result) {
@@ -90,6 +91,7 @@ class JurnalService extends AbstractService
 							->setAkun($itemJurnal->akun->id)
 							->setDebet_kredit($itemJurnal->debet_kredit)
 							->setNilai($itemJurnal->nilai)
+							->setTanggal_insert(time())
 							->create();
             
 				if (!$result) {
@@ -123,6 +125,7 @@ class JurnalService extends AbstractService
 							->setSaldo($itemJurnal->nilai)
 							->setDetail_jurnal($idDetailJurnal)
 							->setRef($jurnalData->jenis_jurnal->singkatan)
+							->setTanggal_insert(time())
 							->create();
 					
 					if (!$result) {
@@ -161,6 +164,7 @@ class JurnalService extends AbstractService
 							->setSaldo($saldoAkhir)
 							->setDetail_jurnal($idDetailJurnal)
 							->setRef($jurnalData->jenis_jurnal->singkatan)
+							->setTanggal_insert(time())
 							->create();
 					
 					if (!$result) {

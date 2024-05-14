@@ -18,6 +18,7 @@ class Jurnal extends Model
     protected $detail_jurnal;
     protected $neraca; 
     protected $ref;
+    protected $tanggal_insert; 
 
     public function initialize()
     {
@@ -281,6 +282,26 @@ class Jurnal extends Model
     public function setDetail_jurnal($detail_jurnal)
     {
         $this->detail_jurnal = $detail_jurnal;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of tanggal_insert
+     */ 
+    public function getTanggal_insert()
+    {
+        return $this->tanggal_insert;
+    }
+
+    /**
+     * Set the value of tanggal_insert
+     *
+     * @return  self
+     */ 
+    public function setTanggal_insert($tanggal_insert)
+    {
+        $this->tanggal_insert = $tanggal_insert;
 
         return $this;
     }
