@@ -9,6 +9,7 @@ class NeracaSaldo extends Model
     protected $id; 
     protected $perusahaan;
     protected $tanggal;
+    protected $tanggal_insert; 
 
     public function initialize()
     {
@@ -72,6 +73,26 @@ class NeracaSaldo extends Model
     public function setTanggal($tanggal)
     {
         $this->tanggal = $tanggal;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of tanggal_insert
+     */ 
+    public function getTanggal_insert()
+    {
+        return $this->tanggal_insert;
+    }
+
+    /**
+     * Set the value of tanggal_insert
+     *
+     * @return  self
+     */ 
+    public function setTanggal_insert($tanggal_insert)
+    {
+        $this->tanggal_insert = $tanggal_insert;
 
         return $this;
     }

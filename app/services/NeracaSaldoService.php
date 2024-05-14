@@ -28,7 +28,6 @@ class NeracaSaldoService extends AbstractService
 					]
 				]
 			);
-
 			
 			if(!$neracaSaldo) {	//neraca saldo belum ada
 				$lastSaldoAkunBukuBesar = BukuBesar::findFirst(
@@ -38,11 +37,12 @@ class NeracaSaldoService extends AbstractService
 							'periodeAkuntansi' => $neracaSaldoData->tanggal,					
 							'perusahaan' => $neracaSaldoData->perusahaan->id,
 						],
-						'order' => 'tanggal DESC'
+						'order' => 'tanggal_insert DESC, tanggal DESC'
 					]
 				);
 
 				if(!$lastSaldoAkunBukuBesar) {
+					$this->db->rollback();
 					throw new ServiceException('Unable to create neraca saldo, tidak ada transaksi untuk priode ini', self::ERROR_UNABLE_CREATE_ITEM);
 				}
 				else {
@@ -53,6 +53,7 @@ class NeracaSaldoService extends AbstractService
 					$result = $neracaSaldo->setId($idNeracaSaldo)
 							->setPerusahaan($neracaSaldoData->perusahaan->id)
 							->setTanggal($neracaSaldoData->tanggal)
+							->setTanggal_insert(time())
                             ->create();
 
 					$daftarSaldoAkunBukuBesar = BukuBesar::find(

@@ -12,6 +12,7 @@ class DetailNeracaSaldo extends Model
     protected $akun;
     protected $debet_kredit;
     protected $nilai;
+    protected $tanggal_insert; 
 
     public function initialize()
     {
@@ -135,6 +136,26 @@ class DetailNeracaSaldo extends Model
     public function setNilai($nilai)
     {
         $this->nilai = $nilai;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of tanggal_insert
+     */ 
+    public function getTanggal_insert()
+    {
+        return $this->tanggal_insert;
+    }
+
+    /**
+     * Set the value of tanggal_insert
+     *
+     * @return  self
+     */ 
+    public function setTanggal_insert($tanggal_insert)
+    {
+        $this->tanggal_insert = $tanggal_insert;
 
         return $this;
     }
