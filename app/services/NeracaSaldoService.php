@@ -114,7 +114,7 @@ class NeracaSaldoService extends AbstractService
 	 *
 	 * @return array
 	 */
-    public function getNeracaSaldoList($idPerusahaan, $startPriodeAkuntansi, $endPriodeAkuntansi)
+    public function getNeracaSaldoList($idPerusahaan, $priodeAkuntansi)
     {
         try {
 			$daftarNeracaSaldo = NeracaSaldo::find(
@@ -124,7 +124,7 @@ class NeracaSaldoService extends AbstractService
 						'periodeAkuntansi' => $periodeAkuntansi,						
 						'perusahaan' => $idPerusahaan,
 					],
-					'order' => 'tanggal_insert DESC, tanggal DESC'
+					'order' => 'tanggal DESC'
 				]
 			);
 
