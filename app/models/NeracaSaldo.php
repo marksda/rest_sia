@@ -15,6 +15,15 @@ class NeracaSaldo extends Model
     {
         $this->setSchema("laporan");
         $this->setSource('tbl_neraca_saldo');
+        $this->hasMany(
+            'id',
+            DetailNeracaSaldo::class,
+            'neraca_saldo',
+            [
+                'reusable' => false,
+                'alias'    => 'detail_neraca_saldo'
+            ]
+        );
     }   
 
     /**

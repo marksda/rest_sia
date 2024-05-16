@@ -37,7 +37,7 @@ class NeracaSaldoService extends AbstractService
 							'periodeAkuntansi' => $neracaSaldoData->tanggal,					
 							'perusahaan' => $neracaSaldoData->perusahaan->id,
 						],
-						'order' => 'tanggal_insert DESC, tanggal DESC'
+						'order' => 'tanggal_insert ASC, tanggal DESC'
 					]
 				);
 
@@ -117,7 +117,7 @@ class NeracaSaldoService extends AbstractService
     public function getNeracaSaldoList($idPerusahaan, $startPriodeAkuntansi, $endPriodeAkuntansi)
     {
         try {
-			$lastSaldoAkunBukuBesar = BukuBesar::findFirst(
+			$daftarNeracaSaldo = NeracaSaldo::find(
 				[
 					'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
 					'bind'       => [
