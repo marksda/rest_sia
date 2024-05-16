@@ -37,7 +37,7 @@ class NeracaSaldoService extends AbstractService
 							'periodeAkuntansi' => $neracaSaldoData->tanggal,					
 							'perusahaan' => $neracaSaldoData->perusahaan->id,
 						],
-						'order' => 'tanggal_insert ASC, tanggal DESC'
+						'order' => 'tanggal_insert DESC, tanggal DESC'
 					]
 				);
 
@@ -124,7 +124,7 @@ class NeracaSaldoService extends AbstractService
 						'periodeAkuntansi' => $periodeAkuntansi,						
 						'perusahaan' => $idPerusahaan,
 					],
-					'order' => 'tanggal DESC'
+					'order' => 'tanggal_insert DESC, tanggal DESC'
 				]
 			);
 
@@ -132,7 +132,19 @@ class NeracaSaldoService extends AbstractService
 				return [];
 			}
 
-			return $daftarNeracaSaldo->toArray(); 
+			$i = 0;
+			$hasil = array();
+            foreach ($daftarNeracaSaldo as $neracaSaldo) {
+				$tmpArrNeraca = array();
+				$tmpArrNeraca['id'] = $neracaSaldo->getId();
+				$tmpArrNeraca['perusahaan'] = $neracaSaldo->getPerusahaan();
+				$tmpArrNeraca['tanggal'] = $neracaSaldo->getTanggal();
+				$tmpArrNeraca['detail'] = $neracaSaldo->getRelated('detail_neraca_saldo');				
+				$hasil[$i] = $tmpArrNeraca;
+				$i++;
+			}
+
+			return $hasil; 
 		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
