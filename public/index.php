@@ -25,8 +25,6 @@ try {
 			// Getting the return value of method
 			$return = $app->getReturnedValue();
 
-            $app->response->setContent(json_encode($return));
-
 			if (is_array($return)) {
 				// Transforming arrays to JSON
 				$app->response->setContent(json_encode($return));
@@ -37,6 +35,8 @@ try {
 				// Unexpected response
 				throw new Exception('Bad Response');
 			}
+
+			// $app->response->setContent(json_encode($return));
 
 			// Sending response to the client
 			$app->response->send();

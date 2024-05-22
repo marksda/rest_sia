@@ -110,6 +110,65 @@ class NeracaSaldoService extends AbstractService
     }	
 
 	/**
+	 * Delete an existing neraca saldo
+	 *
+	 * @param string $idLama
+	 * @param string $idPerusahaanLama
+	 */
+	public function deleteNeracaSaldo($id, $idPerusahaan)
+	{
+		try {
+			$this->db->begin();
+
+			$neracaSaldo = NeracaSaldo::findFirst(
+				[
+					'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
+					'bind'       => [
+						'id' => $id,						
+						'perusahaan' => $idPerusahaan
+					]
+				]
+			);
+
+			if($neracaSaldo == null) {
+				$this->db->rollback();
+				throw new ServiceException('Neraca saldo not found', self::ERROR_ITEM_NOT_FOUND);
+			}
+
+			$sqlDeleteDetailNeracaSaldo = "
+				DELETE 
+					laporan.tbl_detail_neraca_saldo				
+				WHERE 
+					neraca_saldo = :idNeracaSaldo AND 
+					perusahaan = :idPerusahaan
+				";
+
+			$success = $this->db->execute(
+				$sqlDeleteDetailNeracaSaldo, 
+				[
+					'idNeracaSaldo' => $id,
+					'idPerusahaan' => $idPerusahaan
+				]
+			);
+
+			if(!$success) {
+				$this->db->rollback();
+				throw new ServiceException('Detail neraca saldo not found', self::ERROR_ITEM_NOT_FOUND);
+			}
+			
+			if (false === $neracaSaldo->delete()) {
+				$this->db->rollback();
+				throw new ServiceException('Unable to delete neraca saldo', self::ERROR_UNABLE_DELETE_ITEM);
+			}
+
+			$this->db->commit();
+		} catch (\PDOException $e) {
+			$this->db->rollback();
+			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
+		}
+	}
+
+	/**
 	 * Returns NeracaSaldo list
 	 *
 	 * @return array
