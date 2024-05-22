@@ -19,6 +19,7 @@ use MyApp\Services\JurnalService;
 use MyApp\Services\AkunService;
 use MyApp\Services\DetailJurnalService;
 use MyApp\Services\BukuBesarService;
+use MyApp\Services\NeracaSaldoService;
 
 
 $di = new FactoryDefault();
@@ -124,6 +125,11 @@ $di->setShared(
 $di->setShared(
     'bukuBesarService',
     BukuBesarService::class
+);
+
+$di->setShared(
+    'neracaSaldoService',
+    NeracaSaldoService::class
 );
 
 return $di;

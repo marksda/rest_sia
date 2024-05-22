@@ -17,6 +17,7 @@ use MyApp\Controllers\JurnalController;
 use MyApp\Controllers\AkunController;
 use MyApp\Controllers\DetailJurnalController;
 use MyApp\Controllers\BukuBesarController;
+use MyApp\Controllers\NeracaSaldoController;
 
 
 $path = $app->request->getURI(true);
@@ -262,7 +263,7 @@ switch ($collection) {
         break;  
     case 'neraca_saldo':
         $neracaSaldoCollection = new MicroCollection();
-        
+
         $neracaSaldoCollection
             ->setHandler(NeracaSaldoController::class, true)
             ->setPrefix('/api/neraca_saldo')
