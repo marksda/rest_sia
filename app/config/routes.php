@@ -259,7 +259,21 @@ switch ($collection) {
 
         $app->mount($akunCollection);
 
-        break;         
+        break;  
+    case 'neraca_saldo':
+        $neracaSaldoCollection = new MicroCollection();
+        
+        $neracaSaldoCollection
+            ->setHandler(NeracaSaldoController::class, true)
+            ->setPrefix('/api/neraca_saldo')
+            ->get('/list/{$idperusahaan:[a-zA-Z0-9\_\-]+}/{$priodeAkuntansi:[a-zA-Z0-9\_\-]+}', 'listAction')
+            ->post('/add', 'addAction')
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}/{$idperusahaan:[a-zA-Z0-9\_\-]+}', 'deleteAction')
+            ;
+
+        $app->mount($akunCollection);
+
+        break;                
     default:
         // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
         break;

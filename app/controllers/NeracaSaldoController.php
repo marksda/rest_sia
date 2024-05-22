@@ -79,6 +79,8 @@ class NeracaSaldoController extends Controller
     /**
      * Returns neracaSaldo list
      *
+     * @param string $idPerusahaan
+     * @param string $priodeAkuntansi
      * @return array
      */
     public function listAction($idPerusahaan, $priodeAkuntansi)
