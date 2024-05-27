@@ -13,9 +13,10 @@ class NeracaLajurService extends AbstractService
 	/**
 	 * Creating a new NeracaLajur
 	 *
-	 * @param json $neracaLajurData
+	 * @param stdClass $dataNeracaSaldo
+	 * @param stdClass $dataJurnalPenyesuaian
 	 */
-    public function createNeracaLajur($neracaLajurData)
+    public function createNeracaLajur($dataNeracaSaldo, $dataJurnalPenyesuaian)
     {
 		try {
 			$this->db->begin();
@@ -23,74 +24,50 @@ class NeracaLajurService extends AbstractService
 				[
 					'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
 					'bind'       => [
-						'periodeAkuntansi' => $neracaLajurData->tanggal,						
-						'perusahaan' => $neracaLajurData->perusahaan->id,
+						'periodeAkuntansi' => $dataNeracaSaldo->tanggal,						
+						'idPerusahaan' => $dataNeracaSaldo->perusahaan,
 					]
 				]
 			);
 			
-			if(!$neracaLajur) {	//neraca saldo belum ada
-				$lastSaldoAkunBukuBesar = BukuBesar::findFirst(
-					[
-						'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
-						'bind'       => [
-							'periodeAkuntansi' => $neracaLajurData->tanggal,					
-							'perusahaan' => $neracaLajurData->perusahaan->id,
-						],
-						'order' => 'tanggal_insert DESC, tanggal DESC'
-					]
-				);
+			if(!$neracaLajur) {	//neraca lajur belum ada
+				$neracaLajur   = new NeracaLajur();
+				$random = new Random();
+				$idNeracaLajur = $random->base58(12);
 
-				if(!$lastSaldoAkunBukuBesar) {	//tidak ada data transaksi pada buku besar
-					$this->db->rollback();
-					throw new ServiceException('Unable to create neraca saldo, tidak ada transaksi untuk priode ini', self::ERROR_UNABLE_CREATE_ITEM);
-				}
-				else {	//ada data transaksi pada buku besar
-					$neracaLajur   = new NeracaLajur();
-					$random = new Random();
-					$idNeracaLajur = $random->base58(12);
-					
-					$result = $neracaLajur->setId($idNeracaLajur)
-							->setPerusahaan($neracaLajurData->perusahaan->id)
-							->setTanggal($neracaLajurData->tanggal)
-							->setTanggal_insert(time())
-                            ->create();
+				//insert header neraca lajur
+				$result = $neracaLajur->setId($idNeracaLajur)
+						->setPerusahaan($dataNeracaSaldo->perusahaan)
+						->setTanggal($dataNeracaSaldo->tanggal)
+						->setTanggal_insert(time())
+						->create();
 
-					$daftarSaldoAkunBukuBesar = BukuBesar::find(
-						[
-							'distinct' => 'akun',
-							'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
-							'bind'       => [
-								'periodeAkuntansi' => $neracaLajurData->tanggal,					
-								'perusahaan' => $neracaLajurData->perusahaan->id
-							],
-							'order' => 'tanggal_insert DESC, tanggal DESC'
-						]
-					);
+				//insert detail neraca lajur
+				
+				//insert data neraca saldo
+				$data = array();
+				$count = 0;
+				foreach ($dataNeracaSaldo->detail as $detailNeracaSaldo) {
+					$data[] = $random->base58(12);						
+					$data[] = $detailNeracaSaldo->getPerusahaan();
+					$data[] = $idNeracaLajur;
+					$data[] = $detailNeracaSaldo->getAkun();
+					$data[] = $detailNeracaSaldo->getDebet_kredit();
+					$data[] = $detailNeracaSaldo->getNilai();
+					$data[] = time();
+					$count++;
+				}	
 
-					//insert data kedalam detail neraca saldo
-					$data = array();
-					$count = 0;
-					foreach($daftarSaldoAkunBukuBesar as $lastSaldoAkunBukuBesar) {
-						$data[] = $random->base58(12);	
-						$data[] = $neracaLajurData->perusahaan->id;
-						$data[] = $idNeracaLajur;
-						$data[] = $lastSaldoAkunBukuBesar->getAkun();
-						$data[] = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
-						$data[] = $lastSaldoAkunBukuBesar->getSaldo();
-						$data[] = time();
-						$count++;
-					}
+				$values = str_repeat('?,', 6) . '?';
+				$sqlInsertDataNeracaSaldo = "INSERT INTO laporan.tbl_detail_neraca_lajur " .
+					"(id, perusahaan, neraca_lajur, akun, debet_kredit_neraca_sado, nilai_neraca_saldo, tanggal_insert) VALUES " .
+					str_repeat("($values),", $count - 1) . "($values)"; 
 
-					$values = str_repeat('?,', 6) . '?';
-					$sqlInsertDetailNeracaLajur = "INSERT INTO laporan.tbl_detail_neraca_saldo VALUES " .
-									str_repeat("($values),", $count - 1) . "($values)"; 
+				$stmt = $this->db->prepare($sqlInsertDataNeracaSaldo);
+				$stmt->execute($data);
 
-					$stmt = $this->db->prepare($sqlInsertDetailNeracaLajur);
-					$stmt->execute($data);
-				}
 			}
-			else {	//neraca saldo sudah ada
+			else {	//neraca lajur sudah ada
 				$this->db->rollback();
 				throw new ServiceException('Unable to create neraca saldo, neraca saldo periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
 			}

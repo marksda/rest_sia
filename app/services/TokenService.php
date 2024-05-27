@@ -71,7 +71,7 @@ class TokenService extends AbstractService
                     ->setAudience('account')                        // aud
                     ->setContentType('application/json')            // cty - header
                     ->setExpirationTime($expires)                   // exp 
-                    ->setId($result['id'])                          // JTI id 
+                    ->setId($user->getId())                          // JTI id 
                     ->setIssuedAt($issued)                          // iat 
                     ->setIssuer('https://dlhk.ddns.net')            // iss 
                     ->setNotBefore($notBefore)                      // nbf
