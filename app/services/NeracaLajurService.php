@@ -42,9 +42,8 @@ class NeracaLajurService extends AbstractService
 						->setTanggal_insert(time())
 						->create();
 
-				//insert detail neraca lajur
-				
-				//insert data neraca saldo
+				//insert detail neraca lajur				
+				// 1. insert data neraca saldo
 				$data = array();
 				$count = 0;
 				foreach ($dataNeracaSaldo->detail as $detailNeracaSaldo) {
