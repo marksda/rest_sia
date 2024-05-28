@@ -171,17 +171,19 @@ class NeracaSaldoService extends AbstractService
 	/**
 	 * Returns NeracaSaldo list
 	 *
+	 * @param stdClass $filterNeracaSaldo
+	 * 
 	 * @return array
 	 */
-    public function getNeracaSaldoList($idPerusahaan, $priodeAkuntansi)
+    public function getNeracaSaldoList($filterNeracaSaldo)
     {
         try {
 			$daftarNeracaSaldo = NeracaSaldo::find(
 				[
 					'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
 					'bind'       => [
-						'periodeAkuntansi' => $periodeAkuntansi,						
-						'perusahaan' => $idPerusahaan,
+						'periodeAkuntansi' => $filterNeracaSaldo->tanggal,						
+						'perusahaan' => $filterNeracaSaldo->perusahaan->id,
 					],
 					'order' => 'tanggal DESC'
 				]

@@ -19,6 +19,15 @@ class Jurnal extends Model
     {
         $this->setSchema("transaksi");
         $this->setSource('tbl_jurnal');
+        $this->hasMany(
+            'id',
+            DetailJurnal::class,
+            'jurnal',
+            [
+                'reusable' => false,
+                'alias'    => 'detail_jurnal'
+            ]
+        );
     }    
 
     /**

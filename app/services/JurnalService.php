@@ -301,15 +301,21 @@ class JurnalService extends AbstractService
 	/**
 	 * Returns Jurnal list
 	 *
+	 * @param stdClass $filterJurnal
 	 * @return array
 	 */
-    public function getJurnalList()
+    public function getJurnalList($filterJurnal)
     {
         try {
 			$daftarJurnal = Jurnal::find(
 				[
-					'conditions' => '',
-					'bind'       => []
+					'conditions' => 'tanggal = :periodeAkuntansi: AND jenis_jurnal = :jenisJurnal AND perusahaan = :idPerusahaan:',
+					'bind'       => [
+						'periodeAkuntansi' => $filterJurnal->tanggal,	
+						'jenisJurnal' => $filterJurnal->jenisJurnal->id,			
+						'perusahaan' => $filterJurnal->perusahaan->id
+					],
+					'order' => 'tanggal ASC AND office_store_outlet ASC'
 				]
 			);
 
@@ -317,37 +323,24 @@ class JurnalService extends AbstractService
 				return [];
 			}
 
-			// $i = 0;
-			// $hasil = array();
-            // foreach ($daftarJurnal as $Jurnal) {
-			// 	$detail_office = $Jurnal->getRelated('detail_office_store_outlet');				
-            //     $detail_office->setPropinsi($detail_office->getRelated('detail_propinsi'));
-			// 	$detail_office->setKabupaten($detail_office->getRelated('detail_kabupaten'));
-			// 	$detail_office->setKecamatan($detail_office->getRelated('detail_kecamatan'));
-			// 	$detail_office->setDesa($detail_office->getRelated('detail_desa'));
+			$i = 0;
+			$hasil = array();
+            foreach ($daftarJurnal as $Jurnal) {
+				$tmpArrNeraca = array();
+				$tmpArrNeraca['id'] = $neracaSaldo->getId();
+				$tmpArrNeraca['keterangan'] = $neracaSaldo->getKeterangan();
+				$tmpArrNeraca['tanggal'] = $neracaSaldo->getTanggal();
+				$tmpArrNeraca['jenis_jurnal'] = $neracaSaldo->getJenis_jurnal();
+				$tmpArrNeraca['perusahaan'] = $neracaSaldo->getPerusahaan();
+				$tmpArrNeraca['office_store_outlet'] = $neracaSaldo->getOffice_store_outlet();
+				$tmpArrNeraca['ref_bukti'] = $neracaSaldo->getRef_bukti();
+				$tmpArrNeraca['tanggal_insert'] = $neracaSaldo->getTanggal_insert();
+				$tmpArrNeraca['detail'] = $neracaSaldo->getRelated('detail_jurnal');				
+				$hasil[$i] = $tmpArrNeraca;
+				$i++;
+            }
 
-            //     $perusahaan = $detail_office->getRelated('detail_perusahaan');
-            //     $perusahaan->setPropinsi($perusahaan->getRelated('detail_propinsi'));
-			// 	$perusahaan->setKabupaten($perusahaan->getRelated('detail_kabupaten'));
-			// 	$perusahaan->setKecamatan($perusahaan->getRelated('detail_kecamatan'));
-			// 	$perusahaan->setDesa($perusahaan->getRelated('detail_desa'));
-
-            //     $detail_office->setPerusahaan($perusahaan);
-
-			// 	$hak_akses = $Jurnal->getRelated('detail_hak_akses');
-			// 	$modul = $hak_akses->getRelated('detail_modul');
-			// 	$hak_akses->setModul($modul);
-
-			// 	$Jurnal->setPerusahaan($perusahaan);
-			// 	$Jurnal->setOffice_store_outlet($detail_office);
-			// 	$Jurnal->setHak_akses($hak_akses);
-			// 	$Jurnal->setPass(null);
-
-			// 	$hasil[$i] = $Jurnal;
-			// 	$i++;
-            // }
-
-			return $daftarJurnal->toArray(); 
+			return $hasil; 
 		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}

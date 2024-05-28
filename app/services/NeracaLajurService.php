@@ -64,6 +64,21 @@ class NeracaLajurService extends AbstractService
 
 				$stmt = $this->db->prepare($sqlInsertDataNeracaSaldo);
 				$stmt->execute($data);
+				// 1. insert data jurbal penyesuaian
+				$data = array();
+				$count = 0;
+				foreach ($dataJurnalPenyesuaian->detail as $detailJurnalPenyesuaian) {
+					$data[] = $random->base58(12);						
+					$data[] = $detailNeracaSaldo->getPerusahaan();
+					$data[] = $idNeracaLajur;
+					$data[] = $detailNeracaSaldo->getAkun();
+					$data[] = $detailNeracaSaldo->getDebet_kredit();
+					$data[] = $detailNeracaSaldo->getNilai();
+					$data[] = time();
+					$count++;
+				}	
+
+
 
 			}
 			else {	//neraca lajur sudah ada
