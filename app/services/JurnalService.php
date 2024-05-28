@@ -13,7 +13,8 @@ class JurnalService extends AbstractService
 	/**
 	 * Creating a new Jurnal
 	 *
-	 * @param json $jurnalData
+	 * @param stdClass $jurnalData
+	 * @param stdClass $jenisJurnal
 	 */
     public function createJurnal($jurnalData)
     {

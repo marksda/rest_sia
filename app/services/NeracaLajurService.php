@@ -44,53 +44,93 @@ class NeracaLajurService extends AbstractService
 
 				//insert detail neraca lajur				
 				// 1. insert data neraca saldo
+				$idDetailNeracaLajur = null;
 				$data = array();
+				$dataAkunNeracaLajur = array();
 				$count = 0;
 				foreach ($dataNeracaSaldo->detail as $detailNeracaSaldo) {
-					$data[] = $random->base58(12);						
+					$idDetailNeracaLajur = $random->base58(12);	
+					$data[] = $idDetailNeracaLajur;					
 					$data[] = $detailNeracaSaldo->getPerusahaan();
 					$data[] = $idNeracaLajur;
 					$data[] = $detailNeracaSaldo->getAkun();
 					$data[] = $detailNeracaSaldo->getDebet_kredit();
 					$data[] = $detailNeracaSaldo->getNilai();
-					$data[] = time();
+					$data[] = time();					
+					$dataAkunNeracaLajur[] = (object) array(
+						'idDetailNeracaLajur' => $idDetailNeracaLajur,
+						'idAkun' => $detailNeracaSaldo->getAkun()
+					);
 					$count++;
 				}	
-
+				
 				$values = str_repeat('?,', 6) . '?';
 				$sqlInsertDataNeracaSaldo = "INSERT INTO laporan.tbl_detail_neraca_lajur " .
 					"(id, perusahaan, neraca_lajur, akun, debet_kredit_neraca_sado, nilai_neraca_saldo, tanggal_insert) VALUES " .
 					str_repeat("($values),", $count - 1) . "($values)"; 
 
 				$stmt = $this->db->prepare($sqlInsertDataNeracaSaldo);
-				$stmt->execute($data);
+				$success = $stmt->execute($data);
 
-				// 1. insert data jurnal penyesuaian
-				$data = array();
-				$count = 0;
+				if(!$success) {
+					$this->db->rollback();
+					throw new ServiceException('Unable to create neraca lajur, gagal insert kolom neraca saldo', self::ERROR_UNABLE_CREATE_ITEM);
+				}
+
+				// 2. insert data jurnal penyesuaian
 				foreach ($dataJurnalPenyesuaian->detail as $detailJurnalPenyesuaian) {
-					if($detailJurnalPenyesuaian->getAkun()) {		//akun sudah ada pada neraca lajur
-
+					$isAkunExis = false;
+					foreach ($dataAkunNeracaLajur as $akunNeracaLajur) {
+						if($akunNeracaLajur->idAkun == $detailJurnalPenyesuaian->getAkun()) {
+							$isAkunExis = true;
+							$idDetailNeracaLajur = $akunNeracaLajur->idDetailNeracaLajur;
+							break;
+						}
 					}
-					else {		//akun belum ada pafa neraca lajur
-						$data[] = $random->base58(12);						
-						$data[] = $idNeracaLajur;					
-						$data[] = $detailNeracaSaldo->getPerusahaan();
-						$data[] = $detailNeracaSaldo->getAkun();
-						$data[] = $detailNeracaSaldo->getDebet_kredit();
-						$data[] = $detailNeracaSaldo->getNilai();
-						$data[] = time();
-						$count++;
+
+					if($isAkunExis) {	//akun sudah ada pada neraca lajur
+						$updateNeracaLajur = "UPDATE laporan.tbl_detail_neraca_lajur SET debet_kredit_jurnal_penyesuaian = ?, nilai_jurnal_penyesuaian = ? " .
+							"WHERE id = ? AND perusahaan = ?";
+
+						$stmt = $this->db->prepare($updateNeracaLajur);
+						$stmt->bindParam(1, $detailJurnalPenyesuaian->getDebet_kredit());
+						$stmt->bindParam(2, $detailJurnalPenyesuaian->getNilai());
+						$stmt->bindParam(3, $idNeracaLajur);
+						$stmt->bindParam(4, $detailJurnalPenyesuaian->getPerusahaan());
+
+						$success = $stmt->execute();
+
+						if(!$success) {
+							$this->db->rollback();
+							throw new ServiceException('Unable to create neraca lajur, gagal insert kolom saldo penyesuaian', self::ERROR_UNABLE_CREATE_ITEM);
+						}
 					}
-					
-				}	
+					else {	//akun belum ada pafa neraca lajur
+						$sqlInsertDataJurnalPenyesuaian = "INSERT INTO laporan.tbl_detail_neraca_lajur " .
+							"(id, perusahaan, neraca_lajur, akun, debet_kredit_jurnal_penyesuaian, " .
+							"nilai_jurnal_penyesuaian, tanggal_insert) VALUES (?, ?, ?, ?, ?, ?, ?)";
+						$stmt = $this->db->prepare($sqlInsertDataJurnalPenyesuaian);
+						$stmt->bindParam(1, $random->base58(12));
+						$stmt->bindParam(2, $detailJurnalPenyesuaian->getPerusahaan());
+						$stmt->bindParam(3, $idNeracaLajur);
+						$stmt->bindParam(4, $detailJurnalPenyesuaian->getAkun());
+						$stmt->bindParam(5, $detailJurnalPenyesuaian->getDebet_kredit());
+						$stmt->bindParam(6, $detailJurnalPenyesuaian->getNilai());
+						$stmt->bindParam(7, time());
+						$success = $stmt->execute();
 
+						if(!$success) {
+							$this->db->rollback();
+							throw new ServiceException('Unable to create neraca lajur, gagal insert kolom neraca saldo', self::ERROR_UNABLE_CREATE_ITEM);
+						}
+					}
+				}
 
-
+				
 			}
 			else {	//neraca lajur sudah ada
 				$this->db->rollback();
-				throw new ServiceException('Unable to create neraca saldo, neraca saldo periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
+				throw new ServiceException('Unable to create neraca lajur, neraca lajur periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
 			}
 			$this->db->commit();
         } catch (\PDOException $e) {
