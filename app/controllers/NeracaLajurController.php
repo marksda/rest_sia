@@ -31,7 +31,7 @@ class NeracaLajurController extends Controller
             $listJurnalPenyesuaian = $this->jurnalService->getJurnalList($filterJurnal);
             $dataJurnalPenyesuaian = count($listJurnalPenyesuaian) > 1 ? (object) $listJurnalPenyesuaian[0]:null;
             
-            $this->neracaLajurService->createNeracaLajur($dataNeracaSaldo, $dataJurnalPenyesuaian);
+            $this->neracaLajurService->createNeracaLajur($data->perusahaan, $data->tanggal, $dataNeracaSaldo, $dataJurnalPenyesuaian);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_ALREADY_EXISTS:

@@ -4,7 +4,6 @@ namespace MyApp\Services;
 
 use MyApp\Models\NeracaLajur;
 use MyApp\Models\DetailNeracaLajur;
-use MyApp\Models\BukuBesar;
 use Phalcon\Encryption\Security\Random;
 
 class NeracaLajurService extends AbstractService
@@ -13,10 +12,12 @@ class NeracaLajurService extends AbstractService
 	/**
 	 * Creating a new NeracaLajur
 	 *
+	 * @param stdClass $perusahaan
+	 * @param string $priode
 	 * @param stdClass $dataNeracaSaldo
 	 * @param stdClass $dataJurnalPenyesuaian
 	 */
-    public function createNeracaLajur($dataNeracaSaldo, $dataJurnalPenyesuaian)
+    public function createNeracaLajur($perusahaan, $priode, $dataNeracaSaldo, $dataJurnalPenyesuaian)
     {
 		try {
 			$this->db->begin();
@@ -24,11 +25,11 @@ class NeracaLajurService extends AbstractService
 				[
 					'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
 					'bind'       => [
-						'periodeAkuntansi' => $dataNeracaSaldo->tanggal,						
-						'idPerusahaan' => $dataNeracaSaldo->perusahaan,
+						'periodeAkuntansi' => $priode,						
+						'idPerusahaan' => $dperusahaan->id,
 					]
 				]
-			);
+			); // menggunakan query model
 			
 			if(!$neracaLajur) {	//neraca lajur belum ada
 				$neracaLajur   = new NeracaLajur();
@@ -36,11 +37,13 @@ class NeracaLajurService extends AbstractService
 				$idNeracaLajur = $random->base58(12);
 
 				//insert header neraca lajur
-				$result = $neracaLajur->setId($idNeracaLajur)
-						->setPerusahaan($dataNeracaSaldo->perusahaan)
-						->setTanggal($dataNeracaSaldo->tanggal)
-						->setTanggal_insert(time())
-						->create();
+				$result = $neracaLajur
+					->setId($idNeracaLajur)
+					->setPerusahaan($perusahaan->id)
+					->setTanggal($priode)
+					->setTanggal_insert(time())
+					->create()
+				;  // menggunakan insert model
 
 				//insert detail neraca lajur				
 				// 1. insert data neraca saldo
@@ -70,7 +73,7 @@ class NeracaLajurService extends AbstractService
 					str_repeat("($values),", $count - 1) . "($values)"; 
 
 				$stmt = $this->db->prepare($sqlInsertDataNeracaSaldo);
-				$success = $stmt->execute($data);
+				$success = $stmt->execute($data);  // menggunakan insert raw sql
 
 				if(!$success) {
 					$this->db->rollback();
@@ -92,13 +95,15 @@ class NeracaLajurService extends AbstractService
 						$updateNeracaLajur = "UPDATE laporan.tbl_detail_neraca_lajur SET debet_kredit_jurnal_penyesuaian = ?, nilai_jurnal_penyesuaian = ? " .
 							"WHERE id = ? AND perusahaan = ?";
 
-						$stmt = $this->db->prepare($updateNeracaLajur);
-						$stmt->bindParam(1, $detailJurnalPenyesuaian->getDebet_kredit());
-						$stmt->bindParam(2, $detailJurnalPenyesuaian->getNilai());
-						$stmt->bindParam(3, $idNeracaLajur);
-						$stmt->bindParam(4, $detailJurnalPenyesuaian->getPerusahaan());
-
-						$success = $stmt->execute();
+						$success = $this->db->execute(
+							$updateNeracaLajur, 
+							[
+								1 => $detailJurnalPenyesuaian->getDebet_kredit(),
+								2 => $detailJurnalPenyesuaian->getNilai(),
+								3 => $idDetailNeracaLajur,
+								4 => $detailJurnalPenyesuaian->getPerusahaan()
+							]
+						);	// menggunakan raw sql
 
 						if(!$success) {
 							$this->db->rollback();
@@ -109,15 +114,19 @@ class NeracaLajurService extends AbstractService
 						$sqlInsertDataJurnalPenyesuaian = "INSERT INTO laporan.tbl_detail_neraca_lajur " .
 							"(id, perusahaan, neraca_lajur, akun, debet_kredit_jurnal_penyesuaian, " .
 							"nilai_jurnal_penyesuaian, tanggal_insert) VALUES (?, ?, ?, ?, ?, ?, ?)";
-						$stmt = $this->db->prepare($sqlInsertDataJurnalPenyesuaian);
-						$stmt->bindParam(1, $random->base58(12));
-						$stmt->bindParam(2, $detailJurnalPenyesuaian->getPerusahaan());
-						$stmt->bindParam(3, $idNeracaLajur);
-						$stmt->bindParam(4, $detailJurnalPenyesuaian->getAkun());
-						$stmt->bindParam(5, $detailJurnalPenyesuaian->getDebet_kredit());
-						$stmt->bindParam(6, $detailJurnalPenyesuaian->getNilai());
-						$stmt->bindParam(7, time());
-						$success = $stmt->execute();
+						
+						$success = $this->db->execute(
+							$sqlInsertDataJurnalPenyesuaian, 
+							[
+								1 => $random->base58(12),
+								2 => $detailJurnalPenyesuaian->getPerusahaan(),
+								3 => $idNeracaLajur,
+								4 => $detailJurnalPenyesuaian->getAkun(),
+								5 => $detailJurnalPenyesuaian->getDebet_kredit(),
+								6 => $detailJurnalPenyesuaian->getNilai(),
+								7 => time()
+							]
+						);	// menggunakan raw sql
 
 						if(!$success) {
 							$this->db->rollback();
@@ -126,7 +135,38 @@ class NeracaLajurService extends AbstractService
 					}
 				}
 
-				
+				// 3. Insert neraca saldo disesuaikan
+				$daftarDetailNeracaLajur = DetailNeracaLajur::query()
+					->where('neraca_lajur = :id_neraca_lajur:')
+					->andWhere('perusahaan = :id_perusahaan:')
+					->bind(
+						[
+							'id_neraca_lajur' => $idNeracaLajur,
+							'id_perusahaan'  => $perusahaan->id,
+						]
+					)
+					->orderBy('akun asc')
+					->execute()
+				; // menggunakan query model
+
+				$dataAkunNeracaLajur = array();
+				foreach ($daftarItemDetailNeracaLajur as $detailItemNeracaLajur) {
+					$isAkunExis = false;
+					foreach ($dataAkunNeracaLajur as $akunNeracaLajur) {
+						if($akunNeracaLajur->idAkun == $detailJurnalPenyesuaian->getAkun()) {
+							$isAkunExis = true;
+							break;
+						}
+					}
+
+					if($isAkunExis) {
+
+					}
+					else {
+						
+					}
+				}
+
 			}
 			else {	//neraca lajur sudah ada
 				$this->db->rollback();
