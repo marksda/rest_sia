@@ -163,10 +163,9 @@ class NeracaLajurService extends AbstractService
 
 					}
 					else {
-						
+
 					}
 				}
-
 			}
 			else {	//neraca lajur sudah ada
 				$this->db->rollback();
