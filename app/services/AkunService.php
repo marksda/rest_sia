@@ -25,7 +25,8 @@ class AkunService extends AbstractService
                            ->setLevel($akunData->level)
                            ->setNama($akunData->nama)
                            ->setKode($akunData->kode)
-			               ->create();
+						   ->setJenis_akun($akunData->kode)
+			               ->create();	//menggunakan model sql
             
 			if (!$result) {
 				throw new ServiceException('Unable to create akun', self::ERROR_UNABLE_CREATE_ITEM);
@@ -57,7 +58,7 @@ class AkunService extends AbstractService
 						'perusahaan' => $idPerusahaanLama
 					]
 				]
-			);
+			); //menggunakan model sql
 
 			if($akun == null) {
 				throw new ServiceException('Unable to update akun', self::ERROR_UNABLE_UPDATE_ITEM);
@@ -73,7 +74,8 @@ class AkunService extends AbstractService
                     header = :header,
 					level = :level,
                     nama = :nama,
-                    kode = :kode
+                    kode = :kode,
+					jenis_akun = :jenis_akun
 				WHERE
 					id = :idLama AND perusahaan = :idPerusahaanLama
 				";
@@ -87,10 +89,11 @@ class AkunService extends AbstractService
 						'level' => $akunDataBaru->level,
 						'nama' => $akunDataBaru->nama,
                         'kode' => $akunDataBaru->kode,
+						'jenis_akun' => $akunDataBaru->jenis_akun,
 						'idLama' => $idLama,
 						'idPerusahaanLama' => $idPerusahaanLama
 					]
-				);
+				);	// menggunakan raw sql
 
 				if(false === $success) {
 					throw new ServiceException('Unable to update akun', self::ERROR_UNABLE_UPDATE_ITEM);
@@ -102,7 +105,8 @@ class AkunService extends AbstractService
                 $akun->setLevel($akunDataBaru->level);
                 $akun->setNama($akunDataBaru->nama);
                 $akun->setKode($akunDataBaru->kode);
-				$result = $akun->update();
+				$akun->setJenis_akun($akunDataBaru->jenis_akun);
+				$result = $akun->update();	//menggunakan model sql
 
 				if ( false === $result) {
 					throw new ServiceException('Unable to update akun', self::ERROR_UNABLE_UPDATE_ITEM);
@@ -135,7 +139,7 @@ class AkunService extends AbstractService
 				throw new ServiceException('Akun not found', self::ERROR_ITEM_NOT_FOUND);
 			}
 
-			if (false === $akun->delete()) {
+			if (false === $akun->delete()) {  //menggunakan model sql
 				throw new ServiceException('Unable to delete akun', self::ERROR_UNABLE_DELETE_ITEM);
 			}
             
@@ -158,7 +162,7 @@ class AkunService extends AbstractService
 					'bind'       => [],
 					// 'columns'    => "id, nama, npwp, kabupaten, kecamatan, desa, detail_alamat, telepone, email, tanggal_registrasi",
 				]
-			);
+			);  // menggunakan model sql
 
 			if (!$daftarAkun) {
 				return [];

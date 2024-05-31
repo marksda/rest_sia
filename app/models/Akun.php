@@ -12,6 +12,7 @@ class Akun extends Model
     protected $level;
     protected $nama;
     protected $kode;
+    protected $jenis_akun;
 
     public function initialize()
     {
@@ -135,6 +136,26 @@ class Akun extends Model
     public function setKode($kode)
     {
         $this->kode = $kode;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of jenis_akun
+     */ 
+    public function getJenis_akun()
+    {
+        return $this->jenis_akun;
+    }
+
+    /**
+     * Set the value of jenis_akun
+     *
+     * @return  self
+     */ 
+    public function setJenis_akun($jenis_akun)
+    {
+        $this->jenis_akun = $jenis_akun;
 
         return $this;
     }

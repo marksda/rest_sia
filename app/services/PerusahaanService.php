@@ -39,7 +39,7 @@ class PerusahaanService extends AbstractService
 
 			$sqlCreateTablePartition = "CREATE TABLE public.akun_".$id." PARTITION OF public.tbl_akun FOR VALUES IN ('".$id."')";
 			
-			$success = $this->db->execute($sqlCreateTablePartition);
+			$success = $this->db->execute($sqlCreateTablePartition);	// menggunakan raw sql
 
 			if(false === $success) {
 				$this->db->rollback();
@@ -48,12 +48,12 @@ class PerusahaanService extends AbstractService
 
 			$sqlFetchAkunTemplate = "
 				SELECT 
-					'" . $id . "' as perusahaan, header::int, level, nama, id as kode " .
+					'" . $id . "' as perusahaan, header::int, level, nama, id as kode, jenis_akun " .
 				"FROM 
 					public.tbl_akun_template
 				";
 
-			$rows = $this->db->fetchAll($sqlFetchAkunTemplate);
+			$rows = $this->db->fetchAll($sqlFetchAkunTemplate);	// menggunakan raw sql
 
 			$data = array();
 			foreach ($rows as $rowData) {
@@ -63,16 +63,16 @@ class PerusahaanService extends AbstractService
 				}
 			}
 
-			$values = str_repeat('?,', 5) . '?';
+			$values = str_repeat('?,', 6) . '?';
 			$sqlInsertAkun = "INSERT INTO public.tbl_akun VALUES " .
 							str_repeat("($values),", count($rows) - 1) . "($values)"; 
 
 			$stmt = $this->db->prepare($sqlInsertAkun);
-			$stmt->execute($data);
+			$stmt->execute($data);	// menggunakan raw sql
 
 			$sqlCreateTablePartition = "CREATE TABLE transaksi.jurnal_".$id." PARTITION OF transaksi.tbl_jurnal FOR VALUES IN ('".$id."')";
 			
-			$success = $this->db->execute($sqlCreateTablePartition);
+			$success = $this->db->execute($sqlCreateTablePartition);	// menggunakan raw sql
 
 			if(false === $success) {
 				$this->db->rollback();
@@ -81,7 +81,7 @@ class PerusahaanService extends AbstractService
 
 			$sqlCreateTablePartition = "CREATE TABLE transaksi.detail_jurnal_".$id." PARTITION OF transaksi.tbl_detail_jurnal FOR VALUES IN ('".$id."')";
 			
-			$success = $this->db->execute($sqlCreateTablePartition);
+			$success = $this->db->execute($sqlCreateTablePartition);	// menggunakan raw sql
 
 			if(false === $success) {
 				$this->db->rollback();
@@ -90,7 +90,7 @@ class PerusahaanService extends AbstractService
 
 			$sqlCreateTablePartition = "CREATE TABLE transaksi.buku_besar_".$id." PARTITION OF transaksi.tbl_buku_besar FOR VALUES IN ('".$id."')";
 			
-			$success = $this->db->execute($sqlCreateTablePartition);
+			$success = $this->db->execute($sqlCreateTablePartition);	// menggunakan raw sql
 
 			if(false === $success) {
 				$this->db->rollback();
