@@ -37,7 +37,7 @@ class NeracaLajurService extends AbstractService
 				$idNeracaLajur = $random->base58(12);
 
 				//insert header neraca lajur
-				$result = $neracaLajur
+				$success = $neracaLajur
 					->setId($idNeracaLajur)
 					->setPerusahaan($perusahaan->id)
 					->setTanggal($priode)
