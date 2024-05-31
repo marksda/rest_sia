@@ -10,14 +10,14 @@ class DetailNeracaLajur extends Model
     protected $perusahaan;
     protected $neraca_lajur;
     protected $akun;
-    protected $debet_kredit_neraca_saldo;
-    protected $nilai_neraca_saldo;
-    protected $debet_kredit_jurnal_penyesuaian;
-    protected $nilai_jurnal_penyesuaian;
-    protected $debet_kredit_laba_rugi;
-    protected $nilai_laba_rugi;
-    protected $debet_kredit_neraca;
-    protected $nilai_neraca;
+    protected $nilai_debet_neraca_saldo;
+    protected $nilai_kredit_neraca_saldo;
+    protected $nilai_debet_jurnal_penyesuaian;
+    protected $nilai_kredit_jurnal_penyesuaian;
+    protected $nilai_debet_laba_rugi;
+    protected $nilai_kredit_laba_rugi;
+    protected $nilai_debet_neraca;
+    protected $nilai_kredit_neraca;
     protected $tanggal_insert; 
 
     public function initialize()
@@ -107,166 +107,6 @@ class DetailNeracaLajur extends Model
     }
 
     /**
-     * Get the value of debet_kredit_neraca_saldo
-     */ 
-    public function getDebet_kredit_neraca_saldo()
-    {
-        return $this->debet_kredit_neraca_saldo;
-    }
-
-    /**
-     * Set the value of debet_kredit_neraca_saldo
-     *
-     * @return  self
-     */ 
-    public function setDebet_kredit_neraca_saldo($debet_kredit_neraca_saldo)
-    {
-        $this->debet_kredit_neraca_saldo = $debet_kredit_neraca_saldo;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of nilai_neraca_saldo
-     */ 
-    public function getNilai_neraca_saldo()
-    {
-        return $this->nilai_neraca_saldo;
-    }
-
-    /**
-     * Set the value of nilai_neraca_saldo
-     *
-     * @return  self
-     */ 
-    public function setNilai_neraca_saldo($nilai_neraca_saldo)
-    {
-        $this->nilai_neraca_saldo = $nilai_neraca_saldo;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of debet_kredit_jurnal_penyesuaian
-     */ 
-    public function getDebet_kredit_jurnal_penyesuaian()
-    {
-        return $this->debet_kredit_jurnal_penyesuaian;
-    }
-
-    /**
-     * Set the value of debet_kredit_jurnal_penyesuaian
-     *
-     * @return  self
-     */ 
-    public function setDebet_kredit_jurnal_penyesuaian($debet_kredit_jurnal_penyesuaian)
-    {
-        $this->debet_kredit_jurnal_penyesuaian = $debet_kredit_jurnal_penyesuaian;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of nilai_jurnal_penyesuaian
-     */ 
-    public function getNilai_jurnal_penyesuaian()
-    {
-        return $this->nilai_jurnal_penyesuaian;
-    }
-
-    /**
-     * Set the value of nilai_jurnal_penyesuaian
-     *
-     * @return  self
-     */ 
-    public function setNilai_jurnal_penyesuaian($nilai_jurnal_penyesuaian)
-    {
-        $this->nilai_jurnal_penyesuaian = $nilai_jurnal_penyesuaian;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of debet_kredit_laba_rugi
-     */ 
-    public function getDebet_kredit_laba_rugi()
-    {
-        return $this->debet_kredit_laba_rugi;
-    }
-
-    /**
-     * Set the value of debet_kredit_laba_rugi
-     *
-     * @return  self
-     */ 
-    public function setDebet_kredit_laba_rugi($debet_kredit_laba_rugi)
-    {
-        $this->debet_kredit_laba_rugi = $debet_kredit_laba_rugi;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of nilai_laba_rugi
-     */ 
-    public function getNilai_laba_rugi()
-    {
-        return $this->nilai_laba_rugi;
-    }
-
-    /**
-     * Set the value of nilai_laba_rugi
-     *
-     * @return  self
-     */ 
-    public function setNilai_laba_rugi($nilai_laba_rugi)
-    {
-        $this->nilai_laba_rugi = $nilai_laba_rugi;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of debet_kredit_neraca
-     */ 
-    public function getDebet_kredit_neraca()
-    {
-        return $this->debet_kredit_neraca;
-    }
-
-    /**
-     * Set the value of debet_kredit_neraca
-     *
-     * @return  self
-     */ 
-    public function setDebet_kredit_neraca($debet_kredit_neraca)
-    {
-        $this->debet_kredit_neraca = $debet_kredit_neraca;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of nilai_neraca
-     */ 
-    public function getNilai_neraca()
-    {
-        return $this->nilai_neraca;
-    }
-
-    /**
-     * Set the value of nilai_neraca
-     *
-     * @return  self
-     */ 
-    public function setNilai_neraca($nilai_neraca)
-    {
-        $this->nilai_neraca = $nilai_neraca;
-
-        return $this;
-    }
-
-    /**
      * Get the value of tanggal_insert
      */ 
     public function getTanggal_insert()
@@ -282,6 +122,166 @@ class DetailNeracaLajur extends Model
     public function setTanggal_insert($tanggal_insert)
     {
         $this->tanggal_insert = $tanggal_insert;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nilai_debet_neraca_saldo
+     */ 
+    public function getNilai_debet_neraca_saldo()
+    {
+        return $this->nilai_debet_neraca_saldo;
+    }
+
+    /**
+     * Set the value of nilai_debet_neraca_saldo
+     *
+     * @return  self
+     */ 
+    public function setNilai_debet_neraca_saldo($nilai_debet_neraca_saldo)
+    {
+        $this->nilai_debet_neraca_saldo = $nilai_debet_neraca_saldo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nilai_kredit_neraca_saldo
+     */ 
+    public function getNilai_kredit_neraca_saldo()
+    {
+        return $this->nilai_kredit_neraca_saldo;
+    }
+
+    /**
+     * Set the value of nilai_kredit_neraca_saldo
+     *
+     * @return  self
+     */ 
+    public function setNilai_kredit_neraca_saldo($nilai_kredit_neraca_saldo)
+    {
+        $this->nilai_kredit_neraca_saldo = $nilai_kredit_neraca_saldo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nilai_debet_jurnal_penyesuaian
+     */ 
+    public function getNilai_debet_jurnal_penyesuaian()
+    {
+        return $this->nilai_debet_jurnal_penyesuaian;
+    }
+
+    /**
+     * Set the value of nilai_debet_jurnal_penyesuaian
+     *
+     * @return  self
+     */ 
+    public function setNilai_debet_jurnal_penyesuaian($nilai_debet_jurnal_penyesuaian)
+    {
+        $this->nilai_debet_jurnal_penyesuaian = $nilai_debet_jurnal_penyesuaian;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nilai_kredit_jurnal_penyesuaian
+     */ 
+    public function getNilai_kredit_jurnal_penyesuaian()
+    {
+        return $this->nilai_kredit_jurnal_penyesuaian;
+    }
+
+    /**
+     * Set the value of nilai_kredit_jurnal_penyesuaian
+     *
+     * @return  self
+     */ 
+    public function setNilai_kredit_jurnal_penyesuaian($nilai_kredit_jurnal_penyesuaian)
+    {
+        $this->nilai_kredit_jurnal_penyesuaian = $nilai_kredit_jurnal_penyesuaian;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nilai_debet_laba_rugi
+     */ 
+    public function getNilai_debet_laba_rugi()
+    {
+        return $this->nilai_debet_laba_rugi;
+    }
+
+    /**
+     * Set the value of nilai_debet_laba_rugi
+     *
+     * @return  self
+     */ 
+    public function setNilai_debet_laba_rugi($nilai_debet_laba_rugi)
+    {
+        $this->nilai_debet_laba_rugi = $nilai_debet_laba_rugi;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nilai_kredit_laba_rugi
+     */ 
+    public function getNilai_kredit_laba_rugi()
+    {
+        return $this->nilai_kredit_laba_rugi;
+    }
+
+    /**
+     * Set the value of nilai_kredit_laba_rugi
+     *
+     * @return  self
+     */ 
+    public function setNilai_kredit_laba_rugi($nilai_kredit_laba_rugi)
+    {
+        $this->nilai_kredit_laba_rugi = $nilai_kredit_laba_rugi;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nilai_debet_neraca
+     */ 
+    public function getNilai_debet_neraca()
+    {
+        return $this->nilai_debet_neraca;
+    }
+
+    /**
+     * Set the value of nilai_debet_neraca
+     *
+     * @return  self
+     */ 
+    public function setNilai_debet_neraca($nilai_debet_neraca)
+    {
+        $this->nilai_debet_neraca = $nilai_debet_neraca;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nilai_kredit_neraca
+     */ 
+    public function getNilai_kredit_neraca()
+    {
+        return $this->nilai_kredit_neraca;
+    }
+
+    /**
+     * Set the value of nilai_kredit_neraca
+     *
+     * @return  self
+     */ 
+    public function setNilai_kredit_neraca($nilai_kredit_neraca)
+    {
+        $this->nilai_kredit_neraca = $nilai_kredit_neraca;
 
         return $this;
     }

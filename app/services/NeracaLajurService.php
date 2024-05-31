@@ -149,22 +149,31 @@ class NeracaLajurService extends AbstractService
 					->execute()
 				; // menggunakan query model
 
-				$dataAkunNeracaLajur = array();
-				foreach ($daftarItemDetailNeracaLajur as $detailItemNeracaLajur) {
-					$isAkunExis = false;
-					foreach ($dataAkunNeracaLajur as $akunNeracaLajur) {
-						if($akunNeracaLajur->idAkun == $detailJurnalPenyesuaian->getAkun()) {
-							$isAkunExis = true;
-							break;
-						}
-					}
+				$neracaSaldoDiseseuaikan = array();
+				$i = 0;
+				foreach ($daftarItemDetailNeracaLajur as $detailItemNeracaLajur) {						
+					$nilaiNeracaSaldo = $detailItemNeracaLajur->getDebet_kredit_neraca_saldo == true ? 
+							$detailItemNeracaLajur-getNilai_neraca_saldo() : $detailItemNeracaLajur-getNilai_neraca_saldo() * -1;
 
-					if($isAkunExis) {
+					$nilaiJurnalPenyesuaian = $detailItemNeracaLajur->getDebet_kredit_jurnal_penyesuaian == true ? 
+											$detailItemNeracaLajur-getNilai_jurnal_penyesuaian() : $detailItemNeracaLajur-getNilai_jurnal_penyesuaian() * -1;
+					
+					$nilaiNeracaSaldoDisesuaikan = $nilaiNeracaSaldo + $nilaiJurnalPenyesuaian;
 
+					$debetKreditNeracaSaldoDisesuaikan  = false;
+
+					if($nilaiNeracaSaldoDisesuaikan > 0) {
+						$debetKreditNeracaSaldoDisesuaikan = true;
 					}
 					else {
-
+						$nilaiNeracaSaldoDisesuaikan = $nilaiNeracaSaldoDisesuaikan * -1;
 					}
+
+					// $neracaSaldoDiseseuaikan[$i] = array(
+					// 	"idAkun" => $detailItemNeracaLajur->getAkun(),
+					// 	""
+					// 	"nilai" => 
+					// );
 				}
 			}
 			else {	//neraca lajur sudah ada
