@@ -36,6 +36,8 @@ class NeracaLajurService extends AbstractService
 				$idNeracaLajur = $random->base58(12);
 
 				
+				$dataNeracaLajur = [];		//data untuk execute raw sql
+				$dataAkunNeracaLajur = [];	//data komputasi lokal table neraca lajur
 				//1.insert header neraca lajur
 				$neracaLajurSQL = "INSERT INTO laporan.tbl_neraca_lajur (id,perusahaan,tanggal,tanggal_insert) VALUES (?,?,?,?,?);";
 				$dataNeracaLajur[] = $idNeracaLajur;
@@ -45,8 +47,6 @@ class NeracaLajurService extends AbstractService
 				
 				//2. insert detail neraca lajur				
 				// 2.1. insert data neraca saldo
-				$dataNeracaLajur = [];		//data untuk execute raw sql
-				$dataAkunNeracaLajur = [];	//data komputasi lokal table neraca lajur
 				$idDetailNeracaLajur = null;
 				foreach ($dataNeracaSaldo->detail as $detailNeracaSaldo) {
 					$neracaLajurSQL = $neracaLajurSQL . $detailNeracaSaldo['debet_kredit'] == true ? "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_debet_neraca_sado) VALUES (?,?,?,?,?);" : "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_kredit_neraca_sado) VALUES (?,?,?,?,?);";
@@ -133,7 +133,24 @@ class NeracaLajurService extends AbstractService
 
 				$this->db->commit();
 
+				unset($dataNeracaLajur);
+				unset($dataAkunNeracaLajur);
+
 				// 2.4. Insert data laba rugi
+				$akunNominalNeracaLajur = "SELECT id, nilai_debet_neraca_saldo_disesuaikan, nilai_kredit_neraca_saldo_disesuaikan FROM laporan.tbl_detail_neraca_lajur WHERE jenis_akun = ? AND perusahaan = ?";
+
+				$result = $connection->query(
+					$akunNominalNeracaLajur,
+					[
+						1 => '2',
+						2 => $perusahaan->id
+					]
+				);
+				
+				while ($item = $result->fetch()) {
+					echo $invoice['name'];
+				}
+				 
 
 				// 2.5. insert data neraca
 
