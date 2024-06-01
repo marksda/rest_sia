@@ -14,19 +14,18 @@ class NeracaLajurService extends AbstractService
 	 *
 	 * @param stdClass $perusahaan
 	 * @param string $priode
-	 * @param stdClass $dataNeracaSaldo
-	 * @param stdClass $dataJurnalPenyesuaian
+	 * @param associative array $dataNeracaSaldo
+	 * @param associative array $dataJurnalPenyesuaian
 	 */
     public function createNeracaLajur($perusahaan, $priode, $dataNeracaSaldo, $dataJurnalPenyesuaian)
     {
 		try {
-			$this->db->begin();
 			$neracaLajur = NeracaLajur::findFirst(
 				[
 					'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
 					'bind'       => [
 						'periodeAkuntansi' => $priode,						
-						'idPerusahaan' => $dperusahaan->id,
+						'idPerusahaan' => $perusahaan->id,
 					]
 				]
 			); // menggunakan query model
@@ -36,151 +35,111 @@ class NeracaLajurService extends AbstractService
 				$random = new Random();
 				$idNeracaLajur = $random->base58(12);
 
+				
 				//insert header neraca lajur
-				$success = $neracaLajur
-					->setId($idNeracaLajur)
-					->setPerusahaan($perusahaan->id)
-					->setTanggal($priode)
-					->setTanggal_insert(time())
-					->create()
-				;  // menggunakan insert model
-
+				$neracaLajurSQL = "INSERT INTO laporan.tbl_neraca_lajur (id,perusahaan,tanggal,tanggal_insert) VALUES (?,?,?,?,?);";
+				$dataNeracaLajur[] = $idNeracaLajur;
+				$dataNeracaLajur[] = $perusahaan->id;
+				$dataNeracaLajur[] = $priode;
+				$dataNeracaLajur[] = time();
+				
 				//insert detail neraca lajur				
 				// 1. insert data neraca saldo
+				$dataNeracaLajur = [];		//data untuk execute raw sql
+				$dataAkunNeracaLajur = [];	//data komputasi lokal table neraca lajur
 				$idDetailNeracaLajur = null;
-				$data = array();
-				$dataAkunNeracaLajur = array();
-				$count = 0;
 				foreach ($dataNeracaSaldo->detail as $detailNeracaSaldo) {
-					$idDetailNeracaLajur = $random->base58(12);	
-					$data[] = $idDetailNeracaLajur;					
-					$data[] = $detailNeracaSaldo->getPerusahaan();
-					$data[] = $idNeracaLajur;
-					$data[] = $detailNeracaSaldo->getAkun();
-					$data[] = $detailNeracaSaldo->getDebet_kredit();
-					$data[] = $detailNeracaSaldo->getNilai();
-					$data[] = time();					
-					$dataAkunNeracaLajur[] = (object) array(
-						'idDetailNeracaLajur' => $idDetailNeracaLajur,
-						'idAkun' => $detailNeracaSaldo->getAkun()
-					);
-					$count++;
-				}	
-				
-				$values = str_repeat('?,', 6) . '?';
-				$sqlInsertDataNeracaSaldo = "INSERT INTO laporan.tbl_detail_neraca_lajur " .
-					"(id, perusahaan, neraca_lajur, akun, debet_kredit_neraca_sado, nilai_neraca_saldo, tanggal_insert) VALUES " .
-					str_repeat("($values),", $count - 1) . "($values)"; 
+					$neracaLajurSQL = $neracaLajurSQL . $detailNeracaSaldo['debet_kredit'] == true ? "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_debet_neraca_sado) VALUES (?,?,?,?,?);" : "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_kredit_neraca_sado) VALUES (?,?,?,?,?);";
 
-				$stmt = $this->db->prepare($sqlInsertDataNeracaSaldo);
-				$success = $stmt->execute($data);  // menggunakan insert raw sql
+					$idDetailNeracaLajur = $random->base58(12);	
+					$dataNeracaLajur[] = $idDetailNeracaLajur;					
+					$dataNeracaLajur[] = $perusahaan->id;
+					$dataNeracaLajur[] = $idNeracaLajur;
+					$dataNeracaLajur[] = $detailNeracaSaldo['akun'];
+					$dataNeracaLajur[] = $detailNeracaSaldo['debet_kredit'];
+					$dataNeracaLajur[] = $detailNeracaSaldo['nilai'];
+
+					$dataAkunNeracaLajur[] = array(
+						'idDetailNeracaLajur' => $idDetailNeracaLajur,
+						'idAkun' => $detailNeracaSaldo['akun'],
+						'nilaiNeracaSaldo' => $detailNeracaSaldo['debet_kredit'] == true ? $detailNeracaSaldo['nilai'] : ($detailNeracaSaldo['nilai'] * -1),
+						'nilaiJurnalPenyesuaian' => 0
+					);
+				}
+				
+				// 2. insert data jurnal penyesuaian dan data
+				foreach ($dataJurnalPenyesuaian->detail as $detailJurnalPenyesuaian) {
+					$isAkunExis = false;
+					$nilaiNeracaSaldo = 0;
+					$i = 0;
+					foreach ($dataAkunNeracaLajur as $akunNeracaLajur) {
+						if($akunNeracaLajur['idAkun'] == $detailJurnalPenyesuaian['akun']) {
+							$isAkunExis = true;
+							$idDetailNeracaLajur = $akunNeracaLajur['idDetailNeracaLajur'];
+							$i++;
+							break;
+						}
+					}
+
+					if($isAkunExis) {	//akun sudah ada pada neraca lajur
+						$neracaLajurSQL = $neracaLajurSQL . $detailJurnalPenyesuaian['debet_kredit'] == true ? "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_debet_jurnal_penyesuaian = ? WHERE id = ? AND perusahaan = ?;" : "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_kredit_jurnal_penyesuaian = ? WHERE id = ? AND perusahaan = ?;";
+
+						$dataNeracaLajur[] = $detailJurnalPenyesuaian['nilai'];
+						$dataNeracaLajur[] = $idDetailNeracaLajur;
+						$dataNeracaLajur[] = $perusahaan->id;
+						$dataAkunNeracaLajur[$i]['nilaiJurnalPenyesuaian'] = $dataAkunNeracaLajur[$i]['nilaiJurnalPenyesuaian'] + $detailJurnalPenyesuaian['debet_kredit'] == true ? $detailJurnalPenyesuaian['nilai'] : ($detailJurnalPenyesuaian['nilai'] * -1);
+
+					}
+					else {	//akun belum ada pafa neraca lajur
+						$neracaLajurSQL = $neracaLajurSQL . $detailJurnalPenyesuaian['debet_kredit'] == true ?
+						"INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_debet_jurnal_penyesuaian) VALUES (?,?,?,?,?);" : "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_kredit_jurnal_penyesuaian) VALUES (?,?,?,?,?);";
+
+						$idDetailNeracaLajur = $random->base58(12);
+						$dataNeracaLajur[] = $idDetailNeracaLajur;
+						$dataNeracaLajur[] = $perusahaan->id;
+						$dataNeracaLajur[] = $idNeracaLajur;
+						$dataNeracaLajur[] = $detailJurnalPenyesuaian['akun'];
+						$dataNeracaLajur[] = $detailJurnalPenyesuaian['nilai'];
+
+						$dataAkunNeracaLajur[] = array(
+							'idDetailNeracaLajur' => $idDetailNeracaLajur,
+							'idAkun' => $detailJurnalPenyesuaian['akun'],
+							'nilaiNeracaSaldo' => null,
+							'nilaiJurnalPenyesuaian' => $detailJurnalPenyesuaian['debet_kredit'] == true ? $detailJurnalPenyesuaian['nilai'] : ($detailJurnalPenyesuaian['nilai'] * -1)
+						);
+					}
+				}
+
+				// 3. Insert data neraca saldo disesuaikan
+				foreach ($dataAkunNeracaLajur as $akunNeracaLajur) {		
+					$nilaiNeracaSaldodisesuaikan = 	$akunNeracaLajur['nilaiNeracaSaldo'] + $akunNeracaLajur['nilaiJurnalPenyesuaian'];			
+					$neracaLajurSQL = $neracaLajurSQL . $nilaiNeracaSaldodisesuaikan < 0 ? "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_kredit_neraca_saldo_disesuaikan = ? WHERE id = ? AND perusahaan = ?;" : "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_debet_neraca_saldo_disesuaikan = ? WHERE id = ? AND perusahaan = ?;";
+
+					$dataNeracaLajur[] = $nilaiNeracaSaldodisesuaikan < 0 ? ($nilaiNeracaSaldodisesuaikan * -1) : $nilaiNeracaSaldodisesuaikan;
+					$dataNeracaLajur[] = $akunNeracaLajur['idDetailNeracaLajur'];
+					$dataNeracaLajur[] = $perusahaan->id;
+
+				}
+				
+				$this->db->begin();
+				$success = $this->db->execute($neracaLajurSQL, $dataNeracaLajur);			
 
 				if(!$success) {
 					$this->db->rollback();
 					throw new ServiceException('Unable to create neraca lajur, gagal insert kolom neraca saldo', self::ERROR_UNABLE_CREATE_ITEM);
 				}
 
-				// 2. insert data jurnal penyesuaian
-				foreach ($dataJurnalPenyesuaian->detail as $detailJurnalPenyesuaian) {
-					$isAkunExis = false;
-					foreach ($dataAkunNeracaLajur as $akunNeracaLajur) {
-						if($akunNeracaLajur->idAkun == $detailJurnalPenyesuaian->getAkun()) {
-							$isAkunExis = true;
-							$idDetailNeracaLajur = $akunNeracaLajur->idDetailNeracaLajur;
-							break;
-						}
-					}
+				$this->db->commit();
 
-					if($isAkunExis) {	//akun sudah ada pada neraca lajur
-						$updateNeracaLajur = "UPDATE laporan.tbl_detail_neraca_lajur SET debet_kredit_jurnal_penyesuaian = ?, nilai_jurnal_penyesuaian = ? " .
-							"WHERE id = ? AND perusahaan = ?";
+				// 4. Insert data laba rugi
 
-						$success = $this->db->execute(
-							$updateNeracaLajur, 
-							[
-								1 => $detailJurnalPenyesuaian->getDebet_kredit(),
-								2 => $detailJurnalPenyesuaian->getNilai(),
-								3 => $idDetailNeracaLajur,
-								4 => $detailJurnalPenyesuaian->getPerusahaan()
-							]
-						);	// menggunakan raw sql
+				// 5. insert data neraca
 
-						if(!$success) {
-							$this->db->rollback();
-							throw new ServiceException('Unable to create neraca lajur, gagal insert kolom saldo penyesuaian', self::ERROR_UNABLE_CREATE_ITEM);
-						}
-					}
-					else {	//akun belum ada pafa neraca lajur
-						$sqlInsertDataJurnalPenyesuaian = "INSERT INTO laporan.tbl_detail_neraca_lajur " .
-							"(id, perusahaan, neraca_lajur, akun, debet_kredit_jurnal_penyesuaian, " .
-							"nilai_jurnal_penyesuaian, tanggal_insert) VALUES (?, ?, ?, ?, ?, ?, ?)";
-						
-						$success = $this->db->execute(
-							$sqlInsertDataJurnalPenyesuaian, 
-							[
-								1 => $random->base58(12),
-								2 => $detailJurnalPenyesuaian->getPerusahaan(),
-								3 => $idNeracaLajur,
-								4 => $detailJurnalPenyesuaian->getAkun(),
-								5 => $detailJurnalPenyesuaian->getDebet_kredit(),
-								6 => $detailJurnalPenyesuaian->getNilai(),
-								7 => time()
-							]
-						);	// menggunakan raw sql
-
-						if(!$success) {
-							$this->db->rollback();
-							throw new ServiceException('Unable to create neraca lajur, gagal insert kolom neraca saldo', self::ERROR_UNABLE_CREATE_ITEM);
-						}
-					}
-				}
-
-				// 3. Insert neraca saldo disesuaikan
-				$daftarDetailNeracaLajur = DetailNeracaLajur::query()
-					->where('neraca_lajur = :id_neraca_lajur:')
-					->andWhere('perusahaan = :id_perusahaan:')
-					->bind(
-						[
-							'id_neraca_lajur' => $idNeracaLajur,
-							'id_perusahaan'  => $perusahaan->id,
-						]
-					)
-					->orderBy('akun asc')
-					->execute()
-				; // menggunakan query model
-
-				$neracaSaldoDiseseuaikan = array();
-				$i = 0;
-				foreach ($daftarItemDetailNeracaLajur as $detailItemNeracaLajur) {						
-					$nilaiNeracaSaldo = $detailItemNeracaLajur->getDebet_kredit_neraca_saldo == true ? 
-							$detailItemNeracaLajur-getNilai_neraca_saldo() : $detailItemNeracaLajur-getNilai_neraca_saldo() * -1;
-
-					$nilaiJurnalPenyesuaian = $detailItemNeracaLajur->getDebet_kredit_jurnal_penyesuaian == true ? 
-											$detailItemNeracaLajur-getNilai_jurnal_penyesuaian() : $detailItemNeracaLajur-getNilai_jurnal_penyesuaian() * -1;
-					
-					$nilaiNeracaSaldoDisesuaikan = $nilaiNeracaSaldo + $nilaiJurnalPenyesuaian;
-
-					$debetKreditNeracaSaldoDisesuaikan  = false;
-
-					if($nilaiNeracaSaldoDisesuaikan > 0) {
-						$debetKreditNeracaSaldoDisesuaikan = true;
-					}
-					else {
-						$nilaiNeracaSaldoDisesuaikan = $nilaiNeracaSaldoDisesuaikan * -1;
-					}
-
-					// $neracaSaldoDiseseuaikan[$i] = array(
-					// 	"idAkun" => $detailItemNeracaLajur->getAkun(),
-					// 	""
-					// 	"nilai" => 
-					// );
-				}
 			}
 			else {	//neraca lajur sudah ada
 				$this->db->rollback();
 				throw new ServiceException('Unable to create neraca lajur, neraca lajur periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
-			}
-			$this->db->commit();
+			}			
         } catch (\PDOException $e) {
 			$this->db->rollback();
             if ($e->getCode() == 23505) {

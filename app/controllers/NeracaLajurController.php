@@ -26,10 +26,8 @@ class NeracaLajurController extends Controller
         $filterJurnal->jenisJurnal = (object) array("id" => '06', "nama" => 'JURNAL PENYESUAIAN');
                 
         try {
-            $listNeracaSaldo = $this->neracaSaldoService->getNeracaSaldoList($filterNeracaSaldo);
-            $dataNeracaSaldo = count($listNeracaSaldo) > 1 ? (object) $listNeracaSaldo[0]:null;
-            $listJurnalPenyesuaian = $this->jurnalService->getJurnalList($filterJurnal);
-            $dataJurnalPenyesuaian = count($listJurnalPenyesuaian) > 1 ? (object) $listJurnalPenyesuaian[0]:null;
+            $dataNeracaSaldo = $this->neracaSaldoService->getNeracaSaldoList($filterNeracaSaldo);
+            $dataJurnalPenyesuaian = $this->jurnalService->getJurnalList($filterJurnal);
             
             $this->neracaLajurService->createNeracaLajur($data->perusahaan, $data->tanggal, $dataNeracaSaldo, $dataJurnalPenyesuaian);
         } catch (ServiceException $e) {
