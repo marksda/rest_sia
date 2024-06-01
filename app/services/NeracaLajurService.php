@@ -36,15 +36,15 @@ class NeracaLajurService extends AbstractService
 				$idNeracaLajur = $random->base58(12);
 
 				
-				//insert header neraca lajur
+				//1.insert header neraca lajur
 				$neracaLajurSQL = "INSERT INTO laporan.tbl_neraca_lajur (id,perusahaan,tanggal,tanggal_insert) VALUES (?,?,?,?,?);";
 				$dataNeracaLajur[] = $idNeracaLajur;
 				$dataNeracaLajur[] = $perusahaan->id;
 				$dataNeracaLajur[] = $priode;
 				$dataNeracaLajur[] = time();
 				
-				//insert detail neraca lajur				
-				// 1. insert data neraca saldo
+				//2. insert detail neraca lajur				
+				// 2.1. insert data neraca saldo
 				$dataNeracaLajur = [];		//data untuk execute raw sql
 				$dataAkunNeracaLajur = [];	//data komputasi lokal table neraca lajur
 				$idDetailNeracaLajur = null;
@@ -67,7 +67,7 @@ class NeracaLajurService extends AbstractService
 					);
 				}
 				
-				// 2. insert data jurnal penyesuaian dan data
+				// 2.2. insert data jurnal penyesuaian dan data
 				foreach ($dataJurnalPenyesuaian->detail as $detailJurnalPenyesuaian) {
 					$isAkunExis = false;
 					$nilaiNeracaSaldo = 0;
@@ -110,7 +110,7 @@ class NeracaLajurService extends AbstractService
 					}
 				}
 
-				// 3. Insert data neraca saldo disesuaikan
+				// 2.3. Insert data neraca saldo disesuaikan
 				foreach ($dataAkunNeracaLajur as $akunNeracaLajur) {		
 					$nilaiNeracaSaldodisesuaikan = 	$akunNeracaLajur['nilaiNeracaSaldo'] + $akunNeracaLajur['nilaiJurnalPenyesuaian'];			
 					$neracaLajurSQL = $neracaLajurSQL . $nilaiNeracaSaldodisesuaikan < 0 ? "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_kredit_neraca_saldo_disesuaikan = ? WHERE id = ? AND perusahaan = ?;" : "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_debet_neraca_saldo_disesuaikan = ? WHERE id = ? AND perusahaan = ?;";
@@ -121,19 +121,21 @@ class NeracaLajurService extends AbstractService
 
 				}
 				
+
+				// eksekusi raw sql untuk tahap 1, 2.1, 2.2, dan 2.3
 				$this->db->begin();
 				$success = $this->db->execute($neracaLajurSQL, $dataNeracaLajur);			
 
 				if(!$success) {
 					$this->db->rollback();
-					throw new ServiceException('Unable to create neraca lajur, gagal insert kolom neraca saldo', self::ERROR_UNABLE_CREATE_ITEM);
+					throw new ServiceException('Unable to create neraca lajur, gagal insert', self::ERROR_UNABLE_CREATE_ITEM);
 				}
 
 				$this->db->commit();
 
-				// 4. Insert data laba rugi
+				// 2.4. Insert data laba rugi
 
-				// 5. insert data neraca
+				// 2.5. insert data neraca
 
 			}
 			else {	//neraca lajur sudah ada
