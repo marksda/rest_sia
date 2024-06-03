@@ -135,6 +135,8 @@ class NeracaLajurService extends AbstractService
 
 				unset($dataNeracaLajur);
 				unset($dataAkunNeracaLajur);
+				$dataNeracaLajur = [];
+				$neracaLajurSQL = "";
 
 				// 2.4. Insert data laba rugi
 				$akunNominalNeracaLajur = "SELECT id, nilai_debet_neraca_saldo_disesuaikan, nilai_kredit_neraca_saldo_disesuaikan FROM laporan.tbl_detail_neraca_lajur WHERE jenis_akun = ? AND perusahaan = ?";
@@ -148,17 +150,76 @@ class NeracaLajurService extends AbstractService
 				);
 				
 				while ($item = $result->fetch()) {
-					echo $invoice['name'];
-				}
-				 
+					if($item['nilai_debet_neraca_saldo_disesuaikan'] != null) {
+						$neracaLajurSQL = $neracaLajurSQL .  "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_debet_laba_rugi = ? WHERE id = ? AND perusahaan = ?;";
+						
+						$dataNeracaLajur[] = $item['nilai_debet_neraca_saldo_disesuaikan'];
+						$dataNeracaLajur[] = $item['id'];
+						$dataNeracaLajur[] = $perusahaan->id;
+					}
+					else {
+						$neracaLajurSQL = $neracaLajurSQL .  "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_kredit_laba_rugi = ? WHERE id = ? AND perusahaan = ?;";
+						
+						$dataNeracaLajur[] = $item['nilai_kredit_neraca_saldo_disesuaikan'];
+						$dataNeracaLajur[] = $item['id'];
+						$dataNeracaLajur[] = $perusahaan->id;
+					}					
+				}				 
 
 				// 2.5. insert data neraca
+				$akunRiilNeracaLajur = "SELECT id, nilai_debet_neraca_saldo_disesuaikan, nilai_kredit_neraca_saldo_disesuaikan FROM laporan.tbl_detail_neraca_lajur WHERE jenis_akun = ? AND perusahaan = ?";
 
+				$result = $connection->query(
+					$akunRiilNeracaLajur,
+					[
+						1 => '1',
+						2 => $perusahaan->id
+					]
+				);
+				
+				while ($item = $result->fetch()) {
+					if($item['nilai_debet_neraca_saldo_disesuaikan'] != null) {
+						$neracaLajurSQL = $neracaLajurSQL .  "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_debet_neraca = ? WHERE id = ? AND perusahaan = ?;";
+						
+						$dataNeracaLajur[] = $item['nilai_debet_neraca_saldo_disesuaikan'];
+						$dataNeracaLajur[] = $item['id'];
+						$dataNeracaLajur[] = $perusahaan->id;
+					}
+					else {
+						$neracaLajurSQL = $neracaLajurSQL .  "UPDATE laporan.tbl_detail_neraca_lajur SET nilai_kredit_neraca = ? WHERE id = ? AND perusahaan = ?;";
+						
+						$dataNeracaLajur[] = $item['nilai_kredit_neraca_saldo_disesuaikan'];
+						$dataNeracaLajur[] = $item['id'];
+						$dataNeracaLajur[] = $perusahaan->id;
+					}
+					
+				}	
+
+				$this->db->begin();
+				$success = $this->db->execute($neracaLajurSQL, $dataNeracaLajur);			
+
+				if(!$success) {
+					$this->db->rollback();
+
+					$deleteNeracaLajur = "DELETE laporan.tbl_detail_neraca_lajur WHERE id = ? AND perusahaan = ?";
+
+					$this->db->execute->query(
+						$deleteNeracaLajur,
+						[
+							1 => $idNeracaLajur,
+							2 => $perusahaan->id
+						]
+					);
+
+					throw new ServiceException('Unable to create neraca lajur, gagal insert kolom laba rugi atau kolom neraca', self::ERROR_UNABLE_CREATE_ITEM);
+				}
+				$this->db->commit();
 			}
 			else {	//neraca lajur sudah ada
 				$this->db->rollback();
 				throw new ServiceException('Unable to create neraca lajur, neraca lajur periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
-			}			
+			}	
+					
         } catch (\PDOException $e) {
 			$this->db->rollback();
             if ($e->getCode() == 23505) {
