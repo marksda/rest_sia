@@ -41,4 +41,49 @@ class NeracaLajurController extends Controller
         }
     }
 
+    /**
+     * Delete an existing neracaSaldo
+     *
+     * @param string $idNeracaLajur
+     * @param string $idPerusahaan
+     */
+    public function deleteAction($idNeracaLajur, $idPerusahaan)
+    {
+        try {
+            $idPerusahaan = new stdClass;
+            $perusahaan->id = $idPerusahaan;
+            $this->neracaLajurService->deleteNeracaLajur($idNeracaLajur, $perusahaan);
+        } catch (ServiceException $e) {
+            switch ($e->getCode()) {
+                case AbstractService::ERROR_UNABLE_DELETE_ITEM:
+                case AbstractService::ERROR_ITEM_NOT_FOUND:
+                    throw new Http422Exception($e->getMessage(), $e->getCode(), $e);
+                case AbstractService::ERROR_FOREIGN_KEY_VIOLATION:
+                    throw new Http422Exception($e->getMessage(), $e->getCode(), $e);    
+                default:
+                    throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
+            }
+        }
+    }
+
+    /**
+     * Returns neraca lajur
+     *
+     * @param string $priode
+     * @param string $idPerusahaan
+     * @return array
+     */
+    public function listAction($priode, $idPerusahaan)
+    {
+        try {
+            $perusahaan = new stdClass;
+            $perusahaan->id = $idPerusahaan;
+            $neracaSaldoList = $this->neracaSaldoService->getNeracaSaldoList($priode, $perusahaan);
+        } catch (ServiceException $e) {
+            throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
+        }
+
+        return $neracaSaldoList;
+    }
+
 }

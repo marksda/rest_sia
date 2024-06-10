@@ -18,6 +18,7 @@ use MyApp\Controllers\AkunController;
 use MyApp\Controllers\DetailJurnalController;
 use MyApp\Controllers\BukuBesarController;
 use MyApp\Controllers\NeracaSaldoController;
+use MyApp\Controllers\NeracaLajurController;
 
 
 $path = $app->request->getURI(true);
@@ -274,7 +275,21 @@ switch ($collection) {
 
         $app->mount($akunCollection);
 
-        break;                
+        break;      
+    case 'neraca_saldo':
+        $neracaLajurCollection = new MicroCollection();
+
+        $neracaLajurCollection
+            ->setHandler(NeracaLajurController::class, true)
+            ->setPrefix('/api/neraca_lajur')
+            ->get('/list/{$priode:[a-zA-Z0-9\_\-]+}/{$idPerusahaan:[a-zA-Z0-9\_\-]+}', 'listAction')
+            ->post('/add', 'addAction')
+            ->delete('/{idNeracaLajur:[a-zA-Z0-9\_\-]+}/{$idperusahaan:[a-zA-Z0-9\_\-]+}', 'deleteAction')
+            ;
+
+        $app->mount($akunCollection);
+
+        break;              
     default:
         // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
         break;

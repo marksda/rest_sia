@@ -277,7 +277,7 @@ class NeracaLajurService extends AbstractService
 	 *
 	 * @return array
 	 */
-    public function getNeracaLajurList($idPerusahaan, $priodeAkuntansi)
+    public function getNeracaLajurList($periode, $perusahaan)
     {
         try {
 			$daftarNeracaLajur = NeracaLajur::find(
@@ -285,7 +285,7 @@ class NeracaLajurService extends AbstractService
 					'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
 					'bind'       => [
 						'periodeAkuntansi' => $priode,						
-						'perusahaan' => $perusahaan->id,
+						'idPerusahaan' => $perusahaan->id,
 					],
 					'order' => 'tanggal_insert ASC'
 				]
