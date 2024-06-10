@@ -49,15 +49,15 @@ class NeracaLajurService extends AbstractService
 				// 2.1. insert data neraca saldo
 				$idDetailNeracaLajur = null;
 				foreach ($dataNeracaSaldo->detail as $detailNeracaSaldo) {
-					$neracaLajurSQL = $neracaLajurSQL . $detailNeracaSaldo['debet_kredit'] == true ? "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_debet_neraca_sado) VALUES (?,?,?,?,?);" : "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_kredit_neraca_sado) VALUES (?,?,?,?,?);";
+					$neracaLajurSQL = $neracaLajurSQL . $detailNeracaSaldo['debet_kredit'] == true ? "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_debet_neraca_sado, tanggal_insert) VALUES (?,?,?,?,?,?);" : "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_kredit_neraca_sado, tanggal_insert) VALUES (?,?,?,?,?,?);";
 
 					$idDetailNeracaLajur = $random->base58(12);	
 					$dataNeracaLajur[] = $idDetailNeracaLajur;					
 					$dataNeracaLajur[] = $perusahaan->id;
 					$dataNeracaLajur[] = $idNeracaLajur;
 					$dataNeracaLajur[] = $detailNeracaSaldo['akun'];
-					$dataNeracaLajur[] = $detailNeracaSaldo['debet_kredit'];
 					$dataNeracaLajur[] = $detailNeracaSaldo['nilai'];
+					$dataNeracaLajur[] = time();
 
 					$dataAkunNeracaLajur[] = array(
 						'idDetailNeracaLajur' => $idDetailNeracaLajur,
@@ -92,7 +92,7 @@ class NeracaLajurService extends AbstractService
 					}
 					else {	//akun belum ada pafa neraca lajur
 						$neracaLajurSQL = $neracaLajurSQL . $detailJurnalPenyesuaian['debet_kredit'] == true ?
-						"INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_debet_jurnal_penyesuaian) VALUES (?,?,?,?,?);" : "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_kredit_jurnal_penyesuaian) VALUES (?,?,?,?,?);";
+						"INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_debet_jurnal_penyesuaian, tanggal_insert) VALUES (?,?,?,?,?,?);" : "INSERT INTO laporan.tbl_detail_neraca_lajur (id, perusahaan, neraca_lajur, akun, nilai_kredit_jurnal_penyesuaian, tanggal_insert) VALUES (?,?,?,?,?,?);";
 
 						$idDetailNeracaLajur = $random->base58(12);
 						$dataNeracaLajur[] = $idDetailNeracaLajur;
@@ -100,6 +100,7 @@ class NeracaLajurService extends AbstractService
 						$dataNeracaLajur[] = $idNeracaLajur;
 						$dataNeracaLajur[] = $detailJurnalPenyesuaian['akun'];
 						$dataNeracaLajur[] = $detailJurnalPenyesuaian['nilai'];
+						$dataNeracaLajur[] = time();
 
 						$dataAkunNeracaLajur[] = array(
 							'idDetailNeracaLajur' => $idDetailNeracaLajur,
@@ -139,13 +140,14 @@ class NeracaLajurService extends AbstractService
 				$neracaLajurSQL = "";
 
 				// 2.4. Insert data laba rugi
-				$akunNominalNeracaLajur = "SELECT id, nilai_debet_neraca_saldo_disesuaikan, nilai_kredit_neraca_saldo_disesuaikan FROM laporan.tbl_detail_neraca_lajur WHERE jenis_akun = ? AND perusahaan = ?";
+				$akunNominalNeracaLajur = "SELECT id, nilai_debet_neraca_saldo_disesuaikan, nilai_kredit_neraca_saldo_disesuaikan FROM laporan.tbl_detail_neraca_lajur WHERE jenis_akun = ? AND neraca_lajur = ? AND perusahaan = ?";
 
 				$result = $connection->query(
 					$akunNominalNeracaLajur,
 					[
 						1 => '2',
-						2 => $perusahaan->id
+						2 => $idNeracaLajur,
+						3 => $perusahaan->id
 					]
 				);
 				
@@ -167,13 +169,14 @@ class NeracaLajurService extends AbstractService
 				}				 
 
 				// 2.5. insert data neraca
-				$akunRiilNeracaLajur = "SELECT id, nilai_debet_neraca_saldo_disesuaikan, nilai_kredit_neraca_saldo_disesuaikan FROM laporan.tbl_detail_neraca_lajur WHERE jenis_akun = ? AND perusahaan = ?";
+				$akunRiilNeracaLajur = "SELECT id, nilai_debet_neraca_saldo_disesuaikan, nilai_kredit_neraca_saldo_disesuaikan FROM laporan.tbl_detail_neraca_lajur WHERE jenis_akun = ? AND neraca_lajur = ? AND perusahaan = ?";
 
 				$result = $connection->query(
 					$akunRiilNeracaLajur,
 					[
 						1 => '1',
-						2 => $perusahaan->id
+						2 => $idNeracaLajur,
+						3 => $perusahaan->id
 					]
 				);
 				
@@ -237,53 +240,29 @@ class NeracaLajurService extends AbstractService
 	/**
 	 * Delete an existing neraca saldo
 	 *
-	 * @param string $idLama
-	 * @param string $idPerusahaanLama
+	 * @param string $idNeracaLajut
+	 * @param stdClass $perusahaan
 	 */
-	public function deleteNeracaLajur($id, $idPerusahaan)
+	public function deleteNeracaLajur($idNeracaLajur, $perusahaan)
 	{
 		try {
+			$dataNeracaLajur = [];	
+			$deleteNeracaLajurSQL = "DELETE laporan.tbl_neraca_lajur WHERE id = ? AND perusahaan = ?;";
+			$dataNeracaLajur[] = $idNeracaLajur;		
+			$dataNeracaLajur[] = $perusahaan->id;	
+
+			$deleteNeracaLajurSQL = $deleteNeracaLajurSQL . "DELETE laporan.tbl_detail_neraca_lajur WHERE neraca_lajur = ? AND perusahaan = ?;";	
+			$dataNeracaLajur[] = $idNeracaLajur;		
+			$dataNeracaLajur[] = $perusahaan->id;
+			
+
 			$this->db->begin();
 
-			$neracaLajur = NeracaLajur::findFirst(
-				[
-					'conditions' => 'id = :id: AND perusahaan = :perusahaan:',
-					'bind'       => [
-						'id' => $id,						
-						'perusahaan' => $idPerusahaan
-					]
-				]
-			);
-
-			if($neracaLajur == null) {
-				$this->db->rollback();
-				throw new ServiceException('Neraca saldo not found', self::ERROR_ITEM_NOT_FOUND);
-			}
-
-			$sqlDeleteDetailNeracaLajur = "
-				DELETE 
-					laporan.tbl_detail_neraca_saldo				
-				WHERE 
-					neraca_saldo = :idNeracaLajur AND 
-					perusahaan = :idPerusahaan
-				";
-
-			$success = $this->db->execute(
-				$sqlDeleteDetailNeracaLajur, 
-				[
-					'idNeracaLajur' => $id,
-					'idPerusahaan' => $idPerusahaan
-				]
-			);
+			$success = $this->db->execute($deleteNeracaLajurSQL, $dataNeracaLajur);	
 
 			if(!$success) {
 				$this->db->rollback();
-				throw new ServiceException('Detail neraca saldo not found', self::ERROR_ITEM_NOT_FOUND);
-			}
-			
-			if (false === $neracaLajur->delete()) {
-				$this->db->rollback();
-				throw new ServiceException('Unable to delete neraca saldo', self::ERROR_UNABLE_DELETE_ITEM);
+				throw new ServiceException('Unable delete neraca lajur', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 
 			$this->db->commit();
@@ -305,10 +284,10 @@ class NeracaLajurService extends AbstractService
 				[
 					'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
 					'bind'       => [
-						'periodeAkuntansi' => $periodeAkuntansi,						
-						'perusahaan' => $idPerusahaan,
+						'periodeAkuntansi' => $priode,						
+						'perusahaan' => $perusahaan->id,
 					],
-					'order' => 'tanggal DESC'
+					'order' => 'tanggal_insert ASC'
 				]
 			);
 
