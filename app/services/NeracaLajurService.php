@@ -275,6 +275,8 @@ class NeracaLajurService extends AbstractService
 	/**
 	 * Returns NeracaLajur list
 	 *
+	 * @param string $periode
+	 * @param stdClass $perusahaan
 	 * @return array
 	 */
     public function getNeracaLajurList($periode, $perusahaan)

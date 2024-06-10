@@ -69,16 +69,16 @@ class NeracaLajurController extends Controller
     /**
      * Returns neraca lajur
      *
-     * @param string $priode
+     * @param string $periode
      * @param string $idPerusahaan
      * @return array
      */
-    public function listAction($priode, $idPerusahaan)
+    public function listAction($periode, $idPerusahaan)
     {
         try {
             $perusahaan = new stdClass;
             $perusahaan->id = $idPerusahaan;
-            $neracaSaldoList = $this->neracaSaldoService->getNeracaSaldoList($priode, $perusahaan);
+            $neracaSaldoList = $this->neracaSaldoService->getNeracaSaldoList($periode, $perusahaan);
         } catch (ServiceException $e) {
             throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
         }

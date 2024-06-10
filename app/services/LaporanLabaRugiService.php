@@ -10,7 +10,15 @@ namespace MyApp\Services;
  */
 class LaporanLabaRugiService extends AbstractService
 {
-    public function generateBaseIkhtiarLabaRugi($idPerusahaan, $periode) {
+	/**
+	 * Creating 
+	 *
+	 * @param stdClass $perusahaan
+	 * @param string $priode
+	 * @param associative array $dataNeracaSaldo
+	 * @param associative array $dataJurnalPenyesuaian
+	 */
+    public function generateBaseIkhtiarLabaRugi($periode, $perusahaan) {
 
     }
 }

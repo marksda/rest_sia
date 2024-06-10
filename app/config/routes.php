@@ -282,7 +282,7 @@ switch ($collection) {
         $neracaLajurCollection
             ->setHandler(NeracaLajurController::class, true)
             ->setPrefix('/api/neraca_lajur')
-            ->get('/list/{$priode:[a-zA-Z0-9\_\-]+}/{$idPerusahaan:[a-zA-Z0-9\_\-]+}', 'listAction')
+            ->get('/list/{$periode:[a-zA-Z0-9\_\-]+}/{$idPerusahaan:[a-zA-Z0-9\_\-]+}', 'listAction')
             ->post('/add', 'addAction')
             ->delete('/{idNeracaLajur:[a-zA-Z0-9\_\-]+}/{$idperusahaan:[a-zA-Z0-9\_\-]+}', 'deleteAction')
             ;
