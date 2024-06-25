@@ -16,10 +16,10 @@ class LabaRugi extends Model
     public function initialize()
     {
         $this->setSchema("laporan");
-        $this->setSource('tbl_neraca_saldo');
+        $this->setSource('tbl_laba_rugi');
         $this->hasMany(
             'id',
-            DetailNeracaSaldo::class,
+            DetailLabarugi::class,
             'neraca_saldo',
             [
                 'reusable' => false,
