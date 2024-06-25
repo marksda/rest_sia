@@ -4,12 +4,14 @@ namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
 
-class NeracaSaldo extends Model
+class LabaRugi extends Model
 {
     protected $id; 
     protected $perusahaan;
     protected $tanggal;
     protected $tanggal_insert; 
+    protected $metode_pendekatan_akutansi;
+
 
     public function initialize()
     {
@@ -22,6 +24,15 @@ class NeracaSaldo extends Model
             [
                 'reusable' => false,
                 'alias'    => 'detail_neraca_saldo'
+            ]
+        );
+        $this->hasOne(
+            'metode_pendekatan_akutansi',
+            MetodePendekatanAkutansi::class,
+            'id',
+            [
+                'reusable' => false,
+                'alias'    => 'metode_pendekatan_akutansi'
             ]
         );
     }   
@@ -102,6 +113,26 @@ class NeracaSaldo extends Model
     public function setTanggal_insert($tanggal_insert)
     {
         $this->tanggal_insert = $tanggal_insert;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of metode_pendekatan_akutansi
+     */ 
+    public function getMetode_pendekatan_akutansi()
+    {
+        return $this->metode_pendekatan_akutansi;
+    }
+
+    /**
+     * Set the value of metode_pendekatan_akutansi
+     *
+     * @return  self
+     */ 
+    public function setMetode_pendekatan_akutansi($metode_pendekatan_akutansi)
+    {
+        $this->metode_pendekatan_akutansi = $metode_pendekatan_akutansi;
 
         return $this;
     }
