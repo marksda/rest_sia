@@ -99,14 +99,14 @@ class MetodePendekatanAkutansiService extends AbstractService
 	 *
 	 * @param int $id
 	 */
-	public function deleteMetodePendekatanAkutansi($id)
+	public function deleteMetodePendekatanAkutansi($idMetodePendekatanAkutansi)
 	{
 		try {
 			$metodePendekatanAkutansi = MetodePendekatanAkutansi::findFirst(
 				[
 					'conditions' => 'id = :id:',
 					'bind'       => [
-						'id' => $id
+						'id' => $idMetodePendekatanAkutansi
 					]
 				]
 			);
@@ -135,7 +135,7 @@ class MetodePendekatanAkutansiService extends AbstractService
 				[
 					'conditions' => '',
 					'bind'       => [],
-					'columns'    => "id, nama",
+					'columns'    => "id, keterangan",
 				]
 			);
 

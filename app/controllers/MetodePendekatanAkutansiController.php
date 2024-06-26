@@ -8,28 +8,17 @@ use MyApp\Services\AbstractService;
 use MyApp\Controllers\HttpExceptions\Http422Exception;
 use MyApp\Controllers\HttpExceptions\Http500Exception;
 
-class NeracaLajurController extends Controller
+class MetodePendekatanAkutansiController extends Controller
 {
     /**
-	 * Adding neracaLajur
+	 * Adding MetodePendekatanAkutansi
 	 */
     public function addAction()
     {
         $data = $this->request->getJsonRawBody();
-        $filterNeracaSaldo = new stdClass;
-        $filterNeracaSaldo->perusahaan = $data->perusahaan;
-        $filterNeracaSaldo->tanggal = $data->tanggal;
-        
-        $filterJurnal = new stdClass;
-        $filterJurnal->perusahaan = $data->perusahaan;
-        $filterJurnal->tanggal = $data->tanggal;
-        $filterJurnal->jenisJurnal = (object) array("id" => '06', "nama" => 'JURNAL PENYESUAIAN');
                 
-        try {
-            $dataNeracaSaldo = $this->neracaSaldoService->getNeracaSaldoList($filterNeracaSaldo);
-            $dataJurnalPenyesuaian = $this->jurnalService->getJurnalList($filterJurnal);
-            
-            $this->neracaLajurService->createNeracaLajur($data->perusahaan, $data->tanggal, $dataNeracaSaldo, $dataJurnalPenyesuaian);
+        try {            
+            $this->metodePendekatanAkutansi->createMetodePendekatanAkutansi($data);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_ALREADY_EXISTS:
@@ -42,17 +31,15 @@ class NeracaLajurController extends Controller
     }
 
     /**
-     * Delete an existing neracaSaldo
+     * Delete an existing MetodePendekatanAkutansi
      *
-     * @param string $idNeracaLajur
+     * @param string $idMetodePendekatanAkutansi
      * @param string $idPerusahaan
      */
-    public function deleteAction($idNeracaLajur, $idPerusahaan)
+    public function deleteAction($idMetodePendekatanAkutansi)
     {
         try {
-            $perusahaan = new stdClass;
-            $perusahaan->id = $idPerusahaan;
-            $this->neracaLajurService->deleteNeracaLajur($idNeracaLajur, $perusahaan);
+            $this->metodePendekatanAkutansi->deleteMetodePendekatanAkutansi($idMetodePendekatanAkutansi);
         } catch (ServiceException $e) {
             switch ($e->getCode()) {
                 case AbstractService::ERROR_UNABLE_DELETE_ITEM:
@@ -67,23 +54,44 @@ class NeracaLajurController extends Controller
     }
 
     /**
-     * Returns neraca lajur
+     * Updating existing MetodePendekatanAkutansi
+     *
+     * @param string $idLama
+     */
+    public function updateAction($idLama)
+    {
+        $dataBaru = $this->request->getJsonRawBody();
+        
+        try {
+            $this->metodePendekatanAkutansi->updateMetodePendekatanAkutansi($idLama, $dataBaru);
+        } catch (ServiceException $e) {
+            switch ($e->getCode()) {
+                case AbstractService::ERROR_ALREADY_EXISTS:
+                case AbstractService::ERROR_UNABLE_CREATE_ITEM:
+                    throw new Http422Exception($e->getMessage(), $e->getCode(), $e);
+                default:
+                    throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
+            }
+        }
+    }
+
+    /**
+     * Returns MetodePendekatanAkutansi
      *
      * @param string $periode
      * @param string $idPerusahaan
      * @return array
      */
-    public function listAction($periode, $idPerusahaan)
+    public function listAction()
     {
         try {
-            $perusahaan = new stdClass;
-            $perusahaan->id = $idPerusahaan;
-            $neracaSaldoList = $this->neracaSaldoService->getNeracaSaldoList($periode, $perusahaan);
+            $metodePendekatanAkutansiList = $this->metodePendekatanAkutansi->getMetodePendekatanAkutansiList();
+
         } catch (ServiceException $e) {
             throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
         }
 
-        return $neracaSaldoList;
+        return $metodePendekatanAkutansiList;
     }
 
 }

@@ -21,6 +21,7 @@ use MyApp\Services\DetailJurnalService;
 use MyApp\Services\BukuBesarService;
 use MyApp\Services\NeracaSaldoService;
 use MyApp\Services\NeracaLajurService;
+use MyApp\Services\MetodePendekatanAkutansiService;
 
 
 $di = new FactoryDefault();
@@ -136,6 +137,11 @@ $di->setShared(
 $di->setShared(
     'neracaLajurService',
     NeracaLajurService::class
+);
+
+$di->setShared(
+    'metodePendekatanAkutansiService',
+    MetodePendekatanAkutansiService::class
 );
 
 return $di;

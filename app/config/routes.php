@@ -19,6 +19,7 @@ use MyApp\Controllers\DetailJurnalController;
 use MyApp\Controllers\BukuBesarController;
 use MyApp\Controllers\NeracaSaldoController;
 use MyApp\Controllers\NeracaLajurController;
+use MyApp\Controllers\MetodePendekatanAkutansiController;
 
 
 $path = $app->request->getURI(true);
@@ -276,7 +277,7 @@ switch ($collection) {
         $app->mount($akunCollection);
 
         break;      
-    case 'neraca_saldo':
+    case 'neraca_lajur':
         $neracaLajurCollection = new MicroCollection();
 
         $neracaLajurCollection
@@ -289,7 +290,22 @@ switch ($collection) {
 
         $app->mount($akunCollection);
 
-        break;              
+        break;        
+    case 'metode_pendekatan_akutansi':
+        $metodePendekatanAkutansiCollection = new MicroCollection();
+
+        $metodePendekatanAkutansiCollection
+            ->setHandler(MetodePendekatanAkutansiController::class, true)
+            ->setPrefix('/api/metode_pendekatan_akutansi')
+            ->get('/list', 'listAction')
+            ->post('/add', 'addAction')
+            ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+            ->delete('/{id:[a-zA-Z0-9\_\-]+}', 'deleteAction')
+            ;
+
+        $app->mount($metodePendekatanAkutansiCollection);
+
+        break;      
     default:
         // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
         break;
