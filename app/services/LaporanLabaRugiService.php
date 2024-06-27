@@ -15,12 +15,13 @@ class LaporanLabaRugiService extends AbstractService
 {
 	/**
 	 * Creating Laporan laba rugi menggunakan 
-	 * metode ikhtiat laba rugi
+	 * metode ikhtiar laba rugi
 	 *
-	 * @param stdClass $perusahaan
 	 * @param string $priode
-	 * @param associative array $dataNeracaSaldo
-	 * @param associative array $dataJurnalPenyesuaian
+	 * @param stdClass $perusahaan
+	 * @param stdClass $metodePendekatanAkutansi
+	 * //@param associative array $dataNeracaSaldo
+	 * //@param associative array $dataJurnalPenyesuaian
 	 */
     public function generateBaseIkhtiarLabaRugi($periode, $perusahaan, $metodePendekatanAkutansi) {
 		try {
@@ -52,6 +53,10 @@ class LaporanLabaRugiService extends AbstractService
 
 				//2. insert detail laba rugi
 				$idDetailLabaRugi = null;
+				$penjualanBersih = null;
+				$pendapatanJasa = null;
+				$labaKotor = null;				
+				$totalBeban = null;
 			}
 
 		} catch (\Throwable $th) {
