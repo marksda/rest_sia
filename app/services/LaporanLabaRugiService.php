@@ -57,6 +57,13 @@ class LaporanLabaRugiService extends AbstractService
 				$pendapatanJasa = null;
 				$labaKotor = null;				
 				$totalBeban = null;
+
+				if($metodePendekatanAkutansi->id == '1') {		//Ikhtiar laba rugi
+
+				}
+				else {
+
+				}
 			}
 
 		} catch (\Throwable $th) {
