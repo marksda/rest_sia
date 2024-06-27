@@ -39,7 +39,7 @@ class NeracaLajurService extends AbstractService
 				$dataNeracaLajur = [];		//data untuk execute raw sql
 				$dataAkunNeracaLajur = [];	//data komputasi lokal table neraca lajur
 				//1.insert header neraca lajur
-				$neracaLajurSQL = "INSERT INTO laporan.tbl_neraca_lajur (id,perusahaan,tanggal,tanggal_insert) VALUES (?,?,?,?,?);";
+				$neracaLajurSQL = "INSERT INTO laporan.tbl_neraca_lajur (id,perusahaan,tanggal,tanggal_insert) VALUES (?,?,?,?);";
 				$dataNeracaLajur[] = $idNeracaLajur;
 				$dataNeracaLajur[] = $perusahaan->id;
 				$dataNeracaLajur[] = $priode;

@@ -2,6 +2,9 @@
 
 namespace MyApp\Services;
 
+use MyApp\Models\LabaRugi;
+use Phalcon\Encryption\Security\Random;
+
 /**
  * Class laporan laba rugi
  * 
@@ -19,8 +22,41 @@ class LaporanLabaRugiService extends AbstractService
 	 * @param associative array $dataNeracaSaldo
 	 * @param associative array $dataJurnalPenyesuaian
 	 */
-    public function generateBaseIkhtiarLabaRugi($periode, $perusahaan) {
+    public function generateBaseIkhtiarLabaRugi($periode, $perusahaan, $metodePendekatanAkutansi) {
+		try {
+			$labaRugi = LabaRugi::findFirst(
+				[
+					'conditions' => 'tanggal = :periodeAkuntansi: AND perusahaan = :idPerusahaan:',
+					'bind'       => [
+						'periodeAkuntansi' => $priode,						
+						'idPerusahaan' => $perusahaan->id,
+					]
+				]
+			); // menggunakan query model
 
+			if(!$labaRugi) {	//laporan laba rugi belum ada
+				$labaRugi   = new LabaRugi();
+				$random = new Random();
+				$idLabaRugi = $random->base58(12);
+
+				
+				$dataLabaRugi = [];		//data untuk execute raw sql
+				$dataAkunLabaRugi = [];	//data komputasi lokal table laba rugi
+				//1.insert header neraca lajur
+				$labaRugiSQL = "INSERT INTO laporan.tbl_laba_rugi(id,perusahaan,tanggal,tanggal_insert,metode_pendekatan_akutansi) VALUES (?,?,?,?,?);";
+				$dataLabaRugi[] = $idLabaRugi;
+				$dataLabaRugi[] = $perusahaan->id;
+				$dataLabaRugi[] = $priode;
+				$dataLabaRugi[] = time();
+				$dataLabaRugi[] = $metodePendekatanAkutansi;
+
+				//2. insert detail laba rugi
+				$idDetailLabaRugi = null;
+			}
+
+		} catch (\Throwable $th) {
+			//throw $th;
+		}
     }
 
 	/**
