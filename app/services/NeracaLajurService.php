@@ -142,7 +142,7 @@ class NeracaLajurService extends AbstractService
 				// 2.4. Insert data laba rugi
 				$akunNominalNeracaLajur = "SELECT id, nilai_debet_neraca_saldo_disesuaikan, nilai_kredit_neraca_saldo_disesuaikan FROM laporan.tbl_detail_neraca_lajur WHERE jenis_akun = ? AND neraca_lajur = ? AND perusahaan = ?";
 
-				$result = $connection->query(
+				$result = $this->db->query(
 					$akunNominalNeracaLajur,
 					[
 						1 => '2',
