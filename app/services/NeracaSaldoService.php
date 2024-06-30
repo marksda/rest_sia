@@ -53,7 +53,7 @@ class NeracaSaldoService extends AbstractService
 					$result = $neracaSaldo->setId($idNeracaSaldo)
 							->setPerusahaan($neracaSaldoData->perusahaan->id)
 							->setTanggal($neracaSaldoData->tanggal)
-							->setTanggal_insert(time())
+							->setTanggal_insert(\time())
                             ->create();
 
 					$daftarSaldoAkunBukuBesar = BukuBesar::find(
@@ -78,7 +78,7 @@ class NeracaSaldoService extends AbstractService
 						$data[] = $lastSaldoAkunBukuBesar->getAkun();
 						$data[] = $lastSaldoAkunBukuBesar->getDebet_kredit_saldo();
 						$data[] = $lastSaldoAkunBukuBesar->getSaldo();
-						$data[] = time();
+						$data[] = \time();
 						$count++;
 					}
 

@@ -43,7 +43,7 @@ class NeracaLajurService extends AbstractService
 				$dataNeracaLajur[] = $idNeracaLajur;
 				$dataNeracaLajur[] = $perusahaan->id;
 				$dataNeracaLajur[] = $priode;
-				$dataNeracaLajur[] = time();
+				$dataNeracaLajur[] = \time();
 				
 				//2. insert detail neraca lajur				
 				// 2.1. insert data neraca saldo
@@ -57,7 +57,7 @@ class NeracaLajurService extends AbstractService
 					$dataNeracaLajur[] = $idNeracaLajur;
 					$dataNeracaLajur[] = $detailNeracaSaldo['akun'];
 					$dataNeracaLajur[] = $detailNeracaSaldo['nilai'];
-					$dataNeracaLajur[] = time();
+					$dataNeracaLajur[] = \time();
 
 					$dataAkunNeracaLajur[] = array(
 						'idDetailNeracaLajur' => $idDetailNeracaLajur,
@@ -100,7 +100,7 @@ class NeracaLajurService extends AbstractService
 						$dataNeracaLajur[] = $idNeracaLajur;
 						$dataNeracaLajur[] = $detailJurnalPenyesuaian['akun'];
 						$dataNeracaLajur[] = $detailJurnalPenyesuaian['nilai'];
-						$dataNeracaLajur[] = time();
+						$dataNeracaLajur[] = \time();
 
 						$dataAkunNeracaLajur[] = array(
 							'idDetailNeracaLajur' => $idDetailNeracaLajur,

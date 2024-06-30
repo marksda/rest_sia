@@ -157,6 +157,14 @@ class LaporanLabaRugiService extends AbstractService
 					}
 
 					//nilai kolom pendapatan_jasa
+					$akunPendapatanJasa = "SELECT pendapatan_jasa FROM public.tbl_map_akun_pendapatan_jasa WHERE perusahaan = ?";
+
+					$result = $this->db->query(
+						$akunPendapatanJasa,
+						[
+							1 => $perusahaan->id
+						]
+					);
 
 					//nilai kolom laba_kotor
 
@@ -169,7 +177,7 @@ class LaporanLabaRugiService extends AbstractService
 					$dataLabaRugi[] = $idDetailLabaRugi;
 					$dataLabaRugi[] = $perusahaan->id;
 					$dataLabaRugi[] = $idLabaRugi;
-					$dataLabaRugi[] = json_encode($penjualanBersih);
+					$dataLabaRugi[] = \count($penjualanBersih) > 0 ? json_encode($penjualanBersih) : null;
 					
 				}
 				else {	//HPP
