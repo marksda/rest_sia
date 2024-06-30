@@ -20,8 +20,6 @@ class LaporanLabaRugiService extends AbstractService
 	 * @param string $priode
 	 * @param stdClass $perusahaan
 	 * @param stdClass $metodePendekatanAkutansi
-	 * //@param associative array $dataNeracaSaldo
-	 * //@param associative array $dataJurnalPenyesuaian
 	 */
     public function generateBaseIkhtiarLabaRugi($periode, $perusahaan, $metodePendekatanAkutansi) {
 		try {
@@ -65,7 +63,7 @@ class LaporanLabaRugiService extends AbstractService
 				$dataLabaRugi[] = $idLabaRugi;
 				$dataLabaRugi[] = $perusahaan->id;
 				$dataLabaRugi[] = $priode;
-				$dataLabaRugi[] = time();
+				$dataLabaRugi[] = \time();
 				$dataLabaRugi[] = $metodePendekatanAkutansi;
 
 				//2. insert detail laba rugi
@@ -73,31 +71,27 @@ class LaporanLabaRugiService extends AbstractService
 				$penjualanBersih = [];
 				$pendapatanJasa = [];
 				$labaKotor = [];				
-				$totalBeban = [];				
+				$totalBeban = [];	
+				
+				$random = new Random();
+				$idDetailLabaRugi = $random->base58(12);
 
-				if($metodePendekatanAkutansi->id == '1') {		//Ikhtiar laba rugi
-					$random = new Random();
-					$idDetailLabaRugi = $random->base58(12);
+				//nilai kolom penjualan_bersih
+				$akunPenjualanBersih = "SELECT penjualan, retur_penjualan, potongan_penjualan FROM public.tbl_map_akun_penjualan_bersih WHERE perusahaan = ?";
 
-					//nilai kolom penjualan_bersih
-					$akunPenjualanBersih = "SELECT penjualan, retur_penjualan, potongan_penjualan FROM public.tbl_map_akun_penjualan_bersih WHERE perusahaan = ?";
+				$result = $this->db->query(
+					$akunPenjualanBersih,
+					[
+						1 => $perusahaan->id
+					]
+				);
 
-					$result = $this->db->query(
-						$akunPenjualanBersih,
-						[
-							1 => $perusahaan->id
-						]
-					);
-
-					if(!$result) {
-						throw new ServiceException('Mapping akun penjualan bersih tidak ditemukan', self::ERROR_ITEM_NOT_FOUND);
-					}
-
+				if($result) {
 					while ($item = $result->fetch()) {
 						//nilai penjualan
 						$nilaiPenjualan = "SELECT nilai_kredit_laba_rugi as penjualan FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
 
-						$result = $this->db->query(
+						$resultNilai = $this->db->query(
 							$nilaiPenjualan,
 							[
 								1 => $item['penjualan'],
@@ -106,37 +100,36 @@ class LaporanLabaRugiService extends AbstractService
 							]
 						);
 	
-						if(!$result) {
-							$penjualanBersih['penjualan'] = 0;
+						if($resultNilai) {
+							$hasil = $resultNilai->fetch();
+							$penjualanBersih['penjualan'] = $hasil['penjualan'];
 						}
-
-						$hasil = $result->fetch();
-						$penjualanBersih['penjualan'] = $hasil['penjualan'];
 
 						//nilai retur penjualan
 						$nilaiReturPenjualan = "SELECT nilai_debet_laba_rugi as retur_penjualan FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
 
-						$result = $this->db->query(
-							$nilaiPenjualan,
+						$resultNilai = $this->db->query(
+							$nilaiReturPenjualan,
 							[
 								1 => $item['retur_penjualan'],
 								2 => $idNeracaLajur,
 								3 => $perusahaan->id
 							]
 						);
+
+						$tot_retur_potongan_penjualan = 0;
 	
-						if(!$result) {
-							$penjualanBersih['retur_penjualan'] = 0;
+						if($resultNilai) {
+							$hasil = $resultNilai->fetch();
+							$penjualanBersih['retur_penjualan'] = $hasil['retur_penjualan'];
+							$tot_retur_potongan_penjualan = $hasil['retur_penjualan'];
 						}
 
-						$hasil = $result->fetch();
-						$penjualanBersih['retur_penjualan'] = $hasil['retur_penjualan'];
-
 						//nilai potongan penjualan
-						$nilaiReturPenjualan = "SELECT nilai_debet_laba_rugi as potongan_penjualan FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+						$nilaiPotonganPenjualan = "SELECT nilai_debet_laba_rugi as potongan_penjualan FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
 
-						$result = $this->db->query(
-							$nilaiPenjualan,
+						$resultNilai = $this->db->query(
+							$nilaiPotonganPenjualan,
 							[
 								1 => $item['potongan_penjualan'],
 								2 => $idNeracaLajur,
@@ -144,47 +137,73 @@ class LaporanLabaRugiService extends AbstractService
 							]
 						);
 	
-						if(!$result) {
-							$penjualanBersih['potongan_penjualan'] = 0;
+						if($resultNilai) {
+							$hasil = $resultNilai->fetch();
+							$penjualanBersih['potongan_penjualan'] = $hasil['potongan_penjualan'];	
+							$tot_retur_potongan_penjualan += $hasil['potongan_penjualan'];
 						}
 
-						$hasil = $result->fetch();
-						$penjualanBersih['potongan_penjualan'] = $hasil['potongan_penjualan'];		
+						if($tot_retur_potongan_penjualan > 0) {
+							$penjualanBersih['tot_retur_potongan_penjualan'] = $tot_retur_potongan_penjualan;
+						}
 
-						$penjualanBersih['tot_retur_potongan_penjualan'] = $penjualanBersih['retur_penjualan'] = $penjualanBersih['potongan_penjualan'];
-
-						$penjualanBersih['penjualan_bersih'] = $penjualanBersih['penjualan'] - $penjualanBersih['tot_retur_potongan_penjualan'];
+						$penjualanBersih['penjualan_bersih'] = $penjualanBersih['penjualan'] - $tot_retur_potongan_penjualan;
 					}
-
-					//nilai kolom pendapatan_jasa
-					$akunPendapatanJasa = "SELECT pendapatan_jasa FROM public.tbl_map_akun_pendapatan_jasa WHERE perusahaan = ?";
-
-					$result = $this->db->query(
-						$akunPendapatanJasa,
-						[
-							1 => $perusahaan->id
-						]
-					);
-
-					//nilai kolom laba_kotor
-
-					//nilai kolom total_beban
-
-
-					//1.insert detail laba rugi
-					$labaRugiSQL = $labaRugiSQL . "INSERT INTO laporan.tbl_detail_laba_rugi(id, perusahaan, laba_rugi, penjualan_bersih, laba_kotor, pendapatab_jasa, total_beban) VALUES(?,?,?,?,?,?,?);";
-
-					$dataLabaRugi[] = $idDetailLabaRugi;
-					$dataLabaRugi[] = $perusahaan->id;
-					$dataLabaRugi[] = $idLabaRugi;
-					$dataLabaRugi[] = \count($penjualanBersih) > 0 ? json_encode($penjualanBersih) : null;
-					
 				}
-				else {	//HPP
 
+				//nilai kolom pendapatan_jasa
+				$akunPendapatanJasa = "SELECT pendapatan_jasa FROM public.tbl_map_akun_pendapatan_jasa WHERE perusahaan = ?";
+
+				$result = $this->db->query(
+					$akunPendapatanJasa,
+					[
+						1 => $perusahaan->id
+					]
+				);
+
+				if($result) {
+					while ($item = $result->fetch()) {
+						//nilai penjualan
+						$nilaiPendapatanJasa = "SELECT nilai_kredit_laba_rugi as pendapatan_jasa FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+
+						$resultNilai = $this->db->query(
+							$nilaiPenjualan,
+							[
+								1 => $item['pendapatan_jasa'],
+								2 => $idNeracaLajur,
+								3 => $perusahaan->id
+							]
+						);
+	
+						if($resultNilai) {
+							$hasil = $resultNilai->fetch();
+							$pendapatanJasa['pendapatan_jasa'] = $hasil['pendapatan_jasa'];
+						}
+					}
 				}
+
+				//nilai kolom laba_kotor
+				if($metodePendekatanAkutansi->id == '1') {		//metode ikhtiar laba rugi
+										
+				}
+				else {	// metode HPP
+					// dsfsdfsdf
+				}
+
+				//nilai kolom total_beban
+
+				//1.insert detail laba rugi
+				$labaRugiSQL = $labaRugiSQL . "INSERT INTO laporan.tbl_detail_laba_rugi(id, perusahaan, laba_rugi, penjualan_bersih, pendapatan_jasa, laba_kotor, total_beban) VALUES(?,?,?,?,?,?,?);";
+
+				$dataLabaRugi[] = $idDetailLabaRugi;
+				$dataLabaRugi[] = $perusahaan->id;
+				$dataLabaRugi[] = $idLabaRugi;
+				$dataLabaRugi[] = \count($penjualanBersih) > 0 ? json_encode($penjualanBersih) : null;
+				$dataLabaRugi[] = \count($pendapatanJasa) > 0 ? json_encode($pendapatanJasa) : null;
 			}
-
+			else {
+				throw new ServiceException('Unable to create laporan laba rugi, laporan laba rugi periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
+			}
 		} catch (\Throwable $th) {
 			//throw $th;
 		}
