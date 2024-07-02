@@ -163,11 +163,11 @@ class LaporanLabaRugiService extends AbstractService
 
 				if($result) {
 					while ($item = $result->fetch()) {
-						//nilai penjualan
+						//nilai pendapatan jasa
 						$nilaiPendapatanJasa = "SELECT nilai_kredit_laba_rugi as pendapatan_jasa FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
 
 						$resultNilai = $this->db->query(
-							$nilaiPenjualan,
+							$nilaiPendapatanJasa,
 							[
 								1 => $item['pendapatan_jasa'],
 								2 => $idNeracaLajur,
@@ -184,7 +184,134 @@ class LaporanLabaRugiService extends AbstractService
 
 				//nilai kolom laba_kotor
 				if($metodePendekatanAkutansi->id == '1') {		//metode ikhtiar laba rugi
-										
+					$akunLabaKotor = "SELECT persedian_barang_dagangan, pembelian, retur_pembelian, potongan_pembelian, biaya_angkut_pembelian FROM public.tbl_map_akun_pendapatan_jasa WHERE perusahaan = ?";	
+					
+					$result = $this->db->query(
+						$akunLabaKotor,
+						[
+							1 => $perusahaan->id
+						]
+					);
+
+					if($result) {
+						while ($item = $result->fetch()) {
+							//nilai persedian barang dagang (awal) 
+							$npbd_awal = "SELECT nilai_debet_neraca_saldo as npbb_awal FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+
+							$resultNilai = $this->db->query(
+								$npbd_awal,
+								[
+									1 => $item['persedian_barang_dagangan'],
+									2 => $idNeracaLajur,
+									3 => $perusahaan->id
+								]
+							);
+		
+							if($resultNilai) {
+								$hasil = $resultNilai->fetch();
+								$labaKotor['persedian_barang_dagangan_awal'] = $hasil['npbb_awal'];
+							}
+
+							//pembelian
+							$pembelian_bersih = 0.0;
+							$nilai_pembelian = "SELECT nilai_debet_laba_rugi as pembelian FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+
+							$resultNilai = $this->db->query(
+								$nilai_pembelian,
+								[
+									1 => $item['pembelian'],
+									2 => $idNeracaLajur,
+									3 => $perusahaan->id
+								]
+							);
+		
+							if($resultNilai) {
+								$hasil = $resultNilai->fetch();
+								$labaKotor['pembelian'] = $hasil['pembelian'];
+								$pembelian_bersih = $hasil['pembelian'];
+							}
+
+							//retur pembelian
+							$retur_pembelian = "SELECT nilai_kredit_laba_rugi as retur_pembelian FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+
+							$resultNilai = $this->db->query(
+								$retur_pembelian,
+								[
+									1 => $item['retur_pembelian'],
+									2 => $idNeracaLajur,
+									3 => $perusahaan->id
+								]
+							);
+		
+							if($resultNilai) {
+								$hasil = $resultNilai->fetch();
+								$labaKotor['retur_pembelian'] = $hasil['retur_pembelian'];
+								$pembelian_bersih = $pembelian_bersih - $hasil['retur_pembelian'];
+							}
+
+							//potongan pembelian
+							$potongan_pembelian = "SELECT nilai_kredit_laba_rugi as potongan_pembelian FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+
+							$resultNilai = $this->db->query(
+								$potongan_pembelian,
+								[
+									1 => $item['potongan_pembelian'],
+									2 => $idNeracaLajur,
+									3 => $perusahaan->id
+								]
+							);
+		
+							if($resultNilai) {
+								$hasil = $resultNilai->fetch();
+								$labaKotor['potongan_pembelian'] = $hasil['potongan_pembelian'];
+								$pembelian_bersih = $pembelian_bersih - $hasil['potongan_pembelian'];
+							}
+
+							//biaya angkut pembelian
+							$biaya_angkut_pembelian = "SELECT nilai_debet_laba_rugi as biaya_angkut_pembelian FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+
+							$resultNilai = $this->db->query(
+								$biaya_angkut_pembelian,
+								[
+									1 => $item['biaya_angkut_pembelian'],
+									2 => $idNeracaLajur,
+									3 => $perusahaan->id
+								]
+							);
+		
+							if($resultNilai) {
+								$hasil = $resultNilai->fetch();
+								$labaKotor['biaya_angkut_pembelian'] = $hasil['biaya_angkut_pembelian'];
+								$pembelian_bersih = $pembelian_bersih + $hasil['biaya_angkut_pembelian'];
+							}
+
+							$labaKotor['pembelian_bersih'] = $pembelian_bersih;
+							$labaKotor['btud'] = $labaKotor['persedian_barang_dagangan_awal'] + $labaKotor['pembelian_bersih'];
+
+							//persedian_barang_dagangan_akhir
+							$npbd_akhir = "SELECT nilai_debet_neraca as npbd_akhir FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+
+							$resultNilai = $this->db->query(
+								$npbd_akhir,
+								[
+									1 => $item['persedian_barang_dagangan'],
+									2 => $idNeracaLajur,
+									3 => $perusahaan->id
+								]
+							);
+		
+							if($resultNilai) {
+								$hasil = $resultNilai->fetch();
+								$labaKotor['persedian_barang_dagangan_akhir'] = $hasil['npbd_akhir'];
+							}
+
+							//HPP
+							$labaKotor['harga_pokok_penjualan'] = $labaKotor['btud'] - $labaKotor['persedian_barang_dagangan_akhir'];
+
+							//laba kotor
+							$labaKotor['laba_kotor'] = $penjualanBersih['penjualan_bersih'] - $labaKotor['harga_pokok_penjualan'];
+						}
+					}
 				}
 				else {	// metode HPP
 					// dsfsdfsdf
@@ -200,6 +327,7 @@ class LaporanLabaRugiService extends AbstractService
 				$dataLabaRugi[] = $idLabaRugi;
 				$dataLabaRugi[] = \count($penjualanBersih) > 0 ? json_encode($penjualanBersih) : null;
 				$dataLabaRugi[] = \count($pendapatanJasa) > 0 ? json_encode($pendapatanJasa) : null;
+				$dataLabaRugi[] = \count($labaKotor) > 0 ? json_encode($pendapatanJasa) : null;
 			}
 			else {
 				throw new ServiceException('Unable to create laporan laba rugi, laporan laba rugi periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
