@@ -21,7 +21,7 @@ class LaporanLabaRugiService extends AbstractService
 	 * @param stdClass $perusahaan
 	 * @param stdClass $metodePendekatanAkutansi
 	 */
-	public function generateBaseIkhtiarLabaRugi($periode, $perusahaan, $metodePendekatanAkutansi) {
+	public function generateLaporanLabaRugi($periode, $perusahaan, $metodePendekatanAkutansi) {
 		try {
 			$labaRugi = LabaRugi::findFirst(
 				[
@@ -53,6 +53,7 @@ class LaporanLabaRugiService extends AbstractService
 				$labaRugi   = new LabaRugi();
 				$random = new Random();
 				$idLabaRugi = $random->base58(12);
+				$idDetailLabaRugi = $random->base58(12);
 				
 				$dataLabaRugi = [];		//data untuk execute raw sql
 				//$dataAkunLabaRugi = [];	//data komputasi lokal table laba rugi
@@ -71,10 +72,7 @@ class LaporanLabaRugiService extends AbstractService
 				$penjualanBersih = [];
 				$pendapatanJasa = [];
 				$labaKotor = [];				
-				$beban = [];	
-				
-				$random = new Random();
-				$idDetailLabaRugi = $random->base58(12);
+				$beban = [];
 
 				//nilai kolom penjualan_bersih
 				$akunPenjualanBersih = "SELECT penjualan, retur_penjualan, potongan_penjualan FROM public.tbl_map_akun_penjualan_bersih WHERE perusahaan = ?";
@@ -182,9 +180,10 @@ class LaporanLabaRugiService extends AbstractService
 					}
 				}
 
-				//nilai kolom laba_kotor
+				//nilai kolom laba kotor
+				$akunLabaKotor = null;
 				if($metodePendekatanAkutansi->id == '1') {		//metode ikhtiar laba rugi
-					$akunLabaKotor = "SELECT persedian_barang_dagangan, pembelian, retur_pembelian, potongan_pembelian, biaya_angkut_pembelian FROM public.tbl_map_akun_pendapatan_jasa WHERE perusahaan = ?";	
+					$akunLabaKotor = "SELECT persedian_barang_dagangan, pembelian, retur_pembelian, potongan_pembelian, biaya_angkut_pembelian FROM public.tbl_map_akun_laba_kotor WHERE perusahaan = ?";	
 					
 					$result = $this->db->query(
 						$akunLabaKotor,
@@ -314,7 +313,15 @@ class LaporanLabaRugiService extends AbstractService
 					}
 				}
 				else {	// metode HPP
-					// dsfsdfsdf
+					$akunLabaKotor = "SELECT harga_pokok_penjualan as hpp FROM public.tbl_map_akun_laba_kotor WHERE perusahaan = ?";	
+
+					$result = $this->db->query(
+						$akunLabaKotor,
+						[
+							1 => $perusahaan->id
+						]
+					);
+
 				}
 
 				//nilai kolom total_beban
@@ -330,8 +337,7 @@ class LaporanLabaRugiService extends AbstractService
 				if($result) {
 					while ($item = $result->fetch()) {
 						$daftarAkunBeban = \json_decode($item['daftar_akun_beban']);
-						foreach($daftarAkunBeban as $key => $keterangan) {
-							// print "$key => $value\n";
+						foreach($daftarAkunBeban as $id => $keterangan) {
 							//nilai beban
 							$nilaiBeban = "SELECT nilai_debet_laba_rugi as nilai_beban FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
 
@@ -367,6 +373,17 @@ class LaporanLabaRugiService extends AbstractService
 				$dataLabaRugi[] = \count($pendapatanJasa) > 0 ? json_encode($pendapatanJasa) : null;
 				$dataLabaRugi[] = \count($labaKotor) > 0 ? json_encode($labaKotor) : null;
 				$dataLabaRugi[] = \count($beban) > 0 ? json_encode($beban) : null;
+
+				// eksekusi raw sql untuk insert table laporan tbl_detail_laba_rugi
+				$this->db->begin();
+				$success = $this->db->execute($neracaLajurSQL, $dataNeracaLajur);			
+
+				if(!$success) {
+					$this->db->rollback();
+					throw new ServiceException('Unable to create neraca lajur, gagal insert', self::ERROR_UNABLE_CREATE_ITEM);
+				}
+
+				$this->db->commit();
 			}
 			else {
 				throw new ServiceException('Unable to create laporan laba rugi, laporan laba rugi periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
@@ -376,16 +393,4 @@ class LaporanLabaRugiService extends AbstractService
 		}
 	}
 
-	/**
-	 * Creating laporan laba rugi menggunakan
-	 * metode hpp
-	 *
-	 * @param stdClass $perusahaan
-	 * @param string $priode
-	 * @param associative array $dataNeracaSaldo
-	 * @param associative array $dataJurnalPenyesuaian
-	 */
-	public function generateBaseHPP($periode, $perusahaan) {
-
-	}
 }
