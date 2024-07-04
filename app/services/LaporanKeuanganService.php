@@ -6,12 +6,12 @@ use MyApp\Models\LabaRugi;
 use Phalcon\Encryption\Security\Random;
 
 /**
- * Class laporan laba rugi
+ * Class laporan Akutansi
  * 
  * sumber data berasal dari kertas kerja / neraca lajur (kolom neraca saldo, laba rugi, dan neraca)
  * 
  **/
-class LaporanLabaRugiService extends AbstractService
+class LaporanKeuanganService extends AbstractService
 {
 	/**
 	 * Creating Laporan laba rugi menggunakan 
@@ -101,6 +101,9 @@ class LaporanLabaRugiService extends AbstractService
 						if($resultNilai) {
 							$hasil = $resultNilai->fetch();
 							$penjualanBersih['penjualan'] = $hasil['penjualan'];
+						}
+						else {
+							$penjualanBersih['penjualan'] = 0.0;
 						}
 
 						//nilai retur penjualan
@@ -210,6 +213,9 @@ class LaporanLabaRugiService extends AbstractService
 								$hasil = $resultNilai->fetch();
 								$labaKotor['persedian_barang_dagangan_awal'] = $hasil['npbb_awal'];
 							}
+							else {
+								$labaKotor['persedian_barang_dagangan_awal'] = 0.0;
+							}
 
 							//pembelian
 							$pembelian_bersih = 0.0;
@@ -228,6 +234,9 @@ class LaporanLabaRugiService extends AbstractService
 								$hasil = $resultNilai->fetch();
 								$labaKotor['pembelian'] = $hasil['pembelian'];
 								$pembelian_bersih = $hasil['pembelian'];
+							}
+							else {
+								$labaKotor['pembelian'] = 0.0;
 							}
 
 							//retur pembelian
@@ -303,6 +312,9 @@ class LaporanLabaRugiService extends AbstractService
 								$hasil = $resultNilai->fetch();
 								$labaKotor['persedian_barang_dagangan_akhir'] = $hasil['npbd_akhir'];
 							}
+							else {
+								$labaKotor['persedian_barang_dagangan_akhir'] = 0.0;
+							}
 
 							//HPP
 							$labaKotor['harga_pokok_penjualan'] = $labaKotor['btud'] - $labaKotor['persedian_barang_dagangan_akhir'];
@@ -321,6 +333,33 @@ class LaporanLabaRugiService extends AbstractService
 							1 => $perusahaan->id
 						]
 					);
+
+					if($result) {
+						while ($item = $result->fetch()) {
+							//nilai HPP
+							$nilaiHpp = "SELECT nilai_debet_laba_rugi as nilai_hpp FROM laporan.tbl_detail_neraca_lajur WHERE akun = ? AND neraca_lajur = ? AND perusahaan = ?";
+
+							$resultNilai = $this->db->query(
+								$nilaiHpp,
+								[
+									1 => $item['hpp'],
+									2 => $idNeracaLajur,
+									3 => $perusahaan->id
+								]
+							);
+		
+							if($resultNilai) {
+								$hasil = $resultNilai->fetch();
+								//hpp
+								$labaKotor['harga_pokok_penjualan'] = $hasil['nilai_hpp'];
+								//laba kotor
+								$labaKotor['laba_kotor'] = $penjualanBersih['penjualan_bersih'] - $labaKotor['harga_pokok_penjualan'];
+							}
+							else {
+								$labaKotor['laba_kotor'] = $penjualanBersih['penjualan_bersih'];
+							}
+						}						
+					}
 
 				}
 
@@ -362,8 +401,7 @@ class LaporanLabaRugiService extends AbstractService
 					}
 				}
 
-
-				//insert detail laba rugi
+				//raw sql insert detail laba rugi
 				$labaRugiSQL = $labaRugiSQL . "INSERT INTO laporan.tbl_detail_laba_rugi(id, perusahaan, laba_rugi, penjualan_bersih, pendapatan_jasa, laba_kotor, total_beban) VALUES(?,?,?,?,?,?,?);";
 
 				$dataLabaRugi[] = $idDetailLabaRugi;
@@ -380,7 +418,7 @@ class LaporanLabaRugiService extends AbstractService
 
 				if(!$success) {
 					$this->db->rollback();
-					throw new ServiceException('Unable to create neraca lajur, gagal insert', self::ERROR_UNABLE_CREATE_ITEM);
+					throw new ServiceException('Unable to create laporan laba rugi, gagal insert', self::ERROR_UNABLE_CREATE_ITEM);
 				}
 
 				$this->db->commit();
@@ -392,5 +430,4 @@ class LaporanLabaRugiService extends AbstractService
 			//throw $th;
 		}
 	}
-
 }
