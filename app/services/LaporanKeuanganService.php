@@ -6,7 +6,7 @@ use MyApp\Models\LabaRugi;
 use Phalcon\Encryption\Security\Random;
 
 /**
- * Class laporan Akutansi
+ * Class laporan keuangan
  * 
  * sumber data berasal dari kertas kerja / neraca lajur (kolom neraca saldo, laba rugi, dan neraca)
  * 
