@@ -427,7 +427,7 @@ class LaporanKeuanganService extends AbstractService
 				throw new ServiceException('Unable to create laporan laba rugi, laporan laba rugi periode ini sudah ada', self::ERROR_UNABLE_CREATE_ITEM);
 			}
 		} catch (\Throwable $th) {
-			//throw $th;
+			throw new ServiceException('Unable to create laporan laba rugi, undetecting error', self::ERROR_UNABLE_CREATE_ITEM);
 		}
 	}
 }
