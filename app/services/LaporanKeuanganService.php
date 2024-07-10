@@ -15,7 +15,7 @@ class LaporanKeuanganService extends AbstractService
 {
 	/**
 	 * Creating Laporan laba rugi menggunakan 
-	 * metode ikhtiar laba rugi
+	 * metode ikhtiar laba rugi atau hpp
 	 *
 	 * @param string $priode
 	 * @param stdClass $perusahaan
