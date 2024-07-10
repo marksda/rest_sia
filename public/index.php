@@ -20,26 +20,43 @@ try {
 
     require(__DIR__ . '/../app/config/routes.php');
 
-    $app->after(
+	$app->options('/{catch:(.*)}', function() use ($app) { 
+		$app->response->setStatusCode(200, "OK")->send();
+	});
+	
+	$app->before(
+		function() use ($app) {
+			$origin = $app->request->getHeader("ORIGIN") ? $app->request->getHeader("ORIGIN") : '*';
+			
+			$app->response->setHeader("Access-Control-Allow-Origin", $origin)
+				->setHeader("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE,OPTIONS')
+				->setHeader("Access-Control-Allow-Headers", 'Origin, X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization')
+				->setHeader("Access-Control-Allow-Credentials", true);
+		}
+	);
+
+	$app->after(
         function () use ($app) {
-			// Getting the return value of method
-			$return = $app->getReturnedValue();
+			if (strtoupper($app->request->getMethod()) != 'OPTIONS') {
+				// Getting the return value of method
+				$return = $app->getReturnedValue();
 
-			if (is_array($return)) {
-				// Transforming arrays to JSON
-				$app->response->setContent(json_encode($return));
-			} elseif (!strlen($return)) {
-				// Successful response without any content
-				$app->response->setStatusCode('204', 'No Content');
-			} else {
-				// Unexpected response
-				throw new Exception('Bad Response');
-			}
+				if (is_array($return)) {
+					// Transforming arrays to JSON
+					$app->response->setContent(json_encode($return));
+				} elseif (!strlen($return)) {
+					// Successful response without any content
+					$app->response->setStatusCode('204', 'No Content');
+				} else {
+					// Unexpected response
+					throw new Exception('Bad Response');
+				}
 
-			// $app->response->setContent(json_encode($return));
+				// $app->response->setContent(json_encode($return));
 
-			// Sending response to the client
-			$app->response->send();
+				// Sending response to the client
+				$app->response->send();
+			}			
 		}
     );
 
