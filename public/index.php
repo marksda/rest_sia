@@ -4,7 +4,7 @@ use Phalcon\Mvc\Micro;
 use MyApp\Controllers\AbstractHttpException;
 use Phalcon\Http\Request\Exception as PhalconException;
 
-(new Phalcon\Support\Debug())->listen();
+// (new Phalcon\Support\Debug())->listen();
 
 try {
     // Loading Configs

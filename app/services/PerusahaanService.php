@@ -48,7 +48,7 @@ class PerusahaanService extends AbstractService
 
 			$sqlFetchAkunTemplate = "
 				SELECT 
-					'" . $id . "' as perusahaan, header::int, level, nama, id as kode, jenis_akun " .
+					'" . $id . "' as perusahaan, header::int, level, nama, id as kode, kelompok_akun " .
 				"FROM 
 					public.tbl_akun_template
 				";

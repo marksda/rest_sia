@@ -4,16 +4,16 @@ namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
 
-class JenisAkun extends Model
+class KelompokAkun extends Model
 {
     protected $id; 
     protected $nama; 
-    protected $keterangan;
+    protected $jenis_akun; 
 
     public function initialize()
     {
         $this->setSchema("public");
-        $this->setSource("tbl_jenis_akun");
+        $this->setSource("tbl_kelompok_akun");
     }   
 
 
@@ -58,21 +58,21 @@ class JenisAkun extends Model
     }
 
     /**
-     * Get the value of keterangan
+     * Get the value of jenis_akun
      */ 
-    public function getKeterangan()
+    public function getJenis_akun()
     {
-        return $this->keterangan;
+        return $this->jenis_akun;
     }
 
     /**
-     * Set the value of keterangan
+     * Set the value of jenis_akun
      *
      * @return  self
      */ 
-    public function setKeterangan($keterangan)
+    public function setJenis_akun($jenis_akun)
     {
-        $this->keterangan = $keterangan;
+        $this->jenis_akun = $jenis_akun;
 
         return $this;
     }

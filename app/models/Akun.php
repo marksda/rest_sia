@@ -12,7 +12,7 @@ class Akun extends Model
     protected $level;
     protected $nama;
     protected $kode;
-    protected $jenis_akun;
+    protected $kelompok_akun;
 
     public function initialize()
     {
@@ -143,9 +143,9 @@ class Akun extends Model
     /**
      * Get the value of jenis_akun
      */ 
-    public function getJenis_akun()
+    public function getKelompok_akun()
     {
-        return $this->jenis_akun;
+        return $this->kelompok_akun;
     }
 
     /**
@@ -153,9 +153,9 @@ class Akun extends Model
      *
      * @return  self
      */ 
-    public function setJenis_akun($jenis_akun)
+    public function setKelompok_akun($kelompok_akun)
     {
-        $this->jenis_akun = $jenis_akun;
+        $this->kelompok_akun = $kelompok_akun;
 
         return $this;
     }
