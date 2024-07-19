@@ -3,6 +3,8 @@
 namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
+use MyApp\Models\Perusahaan;
+use MyApp\Models\KelompokAkun;
 
 class Akun extends Model
 {
@@ -18,6 +20,24 @@ class Akun extends Model
     {
         $this->setSchema("public");
         $this->setSource("tbl_akun");
+        $this->hasOne(
+            'perusahaan',
+            Perusahaan::class,
+            'id',
+            [
+                'reusable' => false,
+                'alias'    => 'detail_perusahaan'
+            ]
+        );
+        $this->hasOne(
+            'kelompok_akun',
+            KelompokAkun::class,
+            'id',
+            [
+                'reusable' => false,
+                'alias'    => 'detail_kelompok_akun'
+            ]
+        );
     }
 
     /**

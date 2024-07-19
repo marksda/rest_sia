@@ -168,7 +168,17 @@ class AkunService extends AbstractService
 				return [];
 			}
 			
-			return $daftarAkun->toArray(); 
+			// return $daftarAkun->toArray(); 
+			$i = 0;
+			$hasil = array();
+            foreach ($daftarAkun as $akun) {
+                $akun->setPerusahaan($akun->getRelated('detail_perusahaan'));
+				$akun->setKelompok_akun($akun->getRelated('detail_kelompok_akun'));
+				$hasil[$i] = $akun;
+				$i++;
+            }
+
+			return $hasil; 
 		} catch (\PDOException $e) {
 			throw new ServiceException($e->getMessage(), $e->getCode(), $e);
 		}
