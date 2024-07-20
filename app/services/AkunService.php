@@ -75,7 +75,7 @@ class AkunService extends AbstractService
 					level = :level,
                     nama = :nama,
                     kode = :kode,
-					jenis_akun = :jenis_akun
+					kelompok_akun = :kelompok_akun
 				WHERE
 					id = :idLama AND perusahaan = :idPerusahaanLama
 				";
@@ -89,7 +89,7 @@ class AkunService extends AbstractService
 						'level' => $akunDataBaru->level,
 						'nama' => $akunDataBaru->nama,
                         'kode' => $akunDataBaru->kode,
-						'jenis_akun' => $akunDataBaru->jenis_akun,
+						'kelompok_akun' => $akunDataBaru->kelompok_akun,
 						'idLama' => $idLama,
 						'idPerusahaanLama' => $idPerusahaanLama
 					]
@@ -105,7 +105,7 @@ class AkunService extends AbstractService
                 $akun->setLevel($akunDataBaru->level);
                 $akun->setNama($akunDataBaru->nama);
                 $akun->setKode($akunDataBaru->kode);
-				$akun->setJenis_akun($akunDataBaru->jenis_akun);
+				$akun->setKelompok_akun($akunDataBaru->kelompok_akun);
 				$result = $akun->update();	//menggunakan model sql
 
 				if ( false === $result) {
