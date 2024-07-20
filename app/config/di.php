@@ -17,6 +17,7 @@ use MyApp\Services\HakAksesService;
 use MyApp\Services\ModulService;
 use MyApp\Services\JurnalService;
 use MyApp\Services\AkunService;
+use MyApp\Services\KelompokAkunService;
 use MyApp\Services\DetailJurnalService;
 use MyApp\Services\BukuBesarService;
 use MyApp\Services\NeracaSaldoService;
@@ -117,6 +118,11 @@ $di->setShared(
 $di->setShared(
     'akunService',
     AkunService::class
+);
+
+$di->setShared(
+    'kelompokAkunService',
+    KelompokAkunService::class
 );
 
 $di->setShared(

@@ -15,6 +15,7 @@ use MyApp\Controllers\HakAksesController;
 use MyApp\Controllers\ModulController;
 use MyApp\Controllers\JurnalController;
 use MyApp\Controllers\AkunController;
+use MyApp\Controllers\KelompokAkunController;
 use MyApp\Controllers\DetailJurnalController;
 use MyApp\Controllers\BukuBesarController;
 use MyApp\Controllers\NeracaSaldoController;
@@ -234,7 +235,22 @@ if (strtoupper($app->request->getMethod()) != 'OPTIONS') {
 
             $app->mount($akunCollection);
 
-            break;   
+            break; 
+        case 'kelompok_akun':
+            $kelompokAkunCollection = new MicroCollection();
+
+            $kelompokAkunCollection
+                ->setHandler(KelompokAkunController::class, true)
+                ->setPrefix('/api/kelompok_akun')
+                ->get('/list', 'listAction')
+                ->post('/add', 'addAction')
+                ->put('/{idLama:[a-zA-Z0-9\_\-]+}', 'updateAction')
+                ->delete('/{idLama:[a-zA-Z0-9\_\-]+}', 'deleteAction')
+                ;
+
+            $app->mount($kelompokAkunCollection);
+
+            break;     
         case 'detail_jurnal':
             $akunCollection = new MicroCollection();
 
