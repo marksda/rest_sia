@@ -155,11 +155,24 @@ class AkunService extends AbstractService
 	 */
     public function getAkunList()
     {
-        try {
+        try {			
+			$configFilter = \json_decode($this->request->get("filter"));  
+			$whereCondition = "";
+			$whereValue = [];
+			
+			foreach ($configFilter->filters as $filter) {
+				if($filter->value != "0") {
+					$whereCondition =  $whereCondition . $filter->fieldName . " = :" . $filter->fieldName . ": AND ";
+					$whereValue[$filter->fieldName] = $filter->value;
+				}
+			}
+			
+			$whereCondition = substr($whereCondition, 0, -5);
+
 			$daftarAkun = Akun::find(
 				[
-					'conditions' => '',
-					'bind'       => [],
+					'conditions' => $whereCondition,
+					'bind'       => $whereValue,
 					// 'columns'    => "id, nama, npwp, kabupaten, kecamatan, desa, detail_alamat, telepone, email, tanggal_registrasi",
 				]
 			);  // menggunakan model sql

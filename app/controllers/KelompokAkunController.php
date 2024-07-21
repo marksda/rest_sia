@@ -83,7 +83,7 @@ class KelompokAkunController extends Controller
     public function listAction()
     {
         try {
-            $kelompokAkunList = $this->kelompokAkunService->getKelompokAkunList();
+            $kelompokAkunList = $this->kelompokAkunService->getKelompokAkunList($filter);
         } catch (ServiceException $e) {
             throw new Http500Exception(_('Internal Server Error'), $e->getCode(), $e);
         }

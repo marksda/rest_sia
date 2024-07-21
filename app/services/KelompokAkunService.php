@@ -130,10 +130,11 @@ class KelompokAkunService extends AbstractService
     /**
 	 * Returns kelompokAkun list
 	 *
+	 * @param stdClass $filter
 	 * @return array
 	 */
     public function getKelompokAkunList()
-    {
+    { 
         try {
 			$daftarKelompokAkun = KelompokAkun::find(
 				[
