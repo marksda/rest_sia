@@ -159,6 +159,7 @@ class AkunService extends AbstractService
 			$configFilter = \json_decode($this->request->get("filter"));  
 			$whereCondition = "";
 			$whereValue = [];
+			$sortCondition = "";
 			
 			foreach ($configFilter->filters as $filter) {
 				if($filter->value != "0") {
@@ -166,13 +167,19 @@ class AkunService extends AbstractService
 					$whereValue[$filter->fieldName] = $filter->value;
 				}
 			}
+
+			foreach ($configFilter->sortOrders as $sort) {
+				$sortCondition =  $sortCondition . $sort->fieldName . " " . $sort->value  . ", ";
+			}
 			
 			$whereCondition = substr($whereCondition, 0, -5);
+			$sortCondition = substr($sortCondition, 0, -2);
 
 			$daftarAkun = Akun::find(
 				[
 					'conditions' => $whereCondition,
 					'bind'       => $whereValue,
+					'order'      => $sortCondition,
 					// 'columns'    => "id, nama, npwp, kabupaten, kecamatan, desa, detail_alamat, telepone, email, tanggal_registrasi",
 				]
 			);  // menggunakan model sql
@@ -185,7 +192,7 @@ class AkunService extends AbstractService
 			$i = 0;
 			$hasil = array();
             foreach ($daftarAkun as $akun) {
-                $akun->setPerusahaan($akun->getRelated('detail_perusahaan'));
+                // $akun->setPerusahaan($akun->getRelated('detail_perusahaan'));
 				$akun->setKelompok_akun($akun->getRelated('detail_kelompok_akun'));
 				$hasil[$i] = $akun;
 				$i++;
