@@ -81,11 +81,12 @@ class TokenService extends AbstractService
 
                 $tokenObject = $builder->getToken();
 
-                
+                $token['id'] = $user->getId();
                 $token['nama'] = $user->getNama();
                 $token['office'] = $user->getOffice_store_outlet();
                 $token['akses'] = $user->getHak_akses();
                 $token['token'] = $tokenObject->getToken();
+                $token['refresh_token'] = $tokenObject->getToken();
             }
 
 			return $token; 
