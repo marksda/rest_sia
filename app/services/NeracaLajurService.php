@@ -67,7 +67,7 @@ class NeracaLajurService extends AbstractService
 					);
 				}
 				
-				// 2.2. insert data jurnal penyesuaian dan data
+				// 2.2. insert data jurnal penyesuaian 
 				foreach ($dataJurnalPenyesuaian->detail as $detailJurnalPenyesuaian) {
 					$isAkunExis = false;
 					$nilaiNeracaSaldo = 0;

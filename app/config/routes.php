@@ -323,7 +323,10 @@ if (strtoupper($app->request->getMethod()) != 'OPTIONS') {
 
             $app->mount($metodePendekatanAkutansiCollection);
 
-            break;      
+            break; 
+        case 'transaksi':
+            
+            break;
         default:
             // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
             break;
