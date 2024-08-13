@@ -21,6 +21,7 @@ use MyApp\Controllers\BukuBesarController;
 use MyApp\Controllers\NeracaSaldoController;
 use MyApp\Controllers\NeracaLajurController;
 use MyApp\Controllers\MetodePendekatanAkutansiController;
+use MyApp\Controllers\TransaksiController;
 
 
 // $methodenya = $app->request->getMethod();
@@ -297,7 +298,6 @@ if (strtoupper($app->request->getMethod()) != 'OPTIONS') {
             break;      
         case 'neraca_lajur':
             $neracaLajurCollection = new MicroCollection();
-
             $neracaLajurCollection
                 ->setHandler(NeracaLajurController::class, true)
                 ->setPrefix('/api/neraca_lajur')
@@ -305,7 +305,6 @@ if (strtoupper($app->request->getMethod()) != 'OPTIONS') {
                 ->post('/add', 'addAction')
                 ->delete('/{idNeracaLajur:[a-zA-Z0-9\_\-]+}/{$idperusahaan:[a-zA-Z0-9\_\-]+}', 'deleteAction')
                 ;
-
             $app->mount($akunCollection);
 
             break;        
@@ -325,7 +324,16 @@ if (strtoupper($app->request->getMethod()) != 'OPTIONS') {
 
             break; 
         case 'transaksi':
-            
+            $transaksiMC = new MicroCollection();
+            $transaksiMC->setHandler(TransaksiController::class, true);
+            $transaksiMC->setPrefix('/api/transaksi');
+            //pembelian
+            // $transaksiMC->get('/pembelian/{$jenisPembelian:[a-zA-Z]+}}/{$periode:[a-zA-Z0-9\_\-]+}/{$idPerusahaan:[a-zA-Z0-9\_\-]+}', 'listAction');
+            $transaksiMC->post('/pembelian', 'setPembelianAction');
+            // $transaksiMC->delete('/pembelian/{$jenisPembelian:[a-zA-Z]+}}/{idNeracaLajur:[a-zA-Z0-9\_\-]+}/{$idperusahaan:[a-zA-Z0-9\_\-]+}', 'deleteAction');
+            //penjualan
+
+            $app->mount($transaksiMC);
             break;
         default:
             // throw new \RuntimeException('HttpException without httpCode or httpMessage');        
