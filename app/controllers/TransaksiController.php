@@ -3,8 +3,8 @@
 namespace MyApp\Controllers;
 
 use Phalcon\Mvc\Controller;
-use MyApp\Entities\SifatPembelian;
-use MyApp\Entities\JenisPembelian;
+use MyApp\Entities\EnumSifatPembelian;
+// use MyApp\Entities\JenisPembelian;
 
 class TransaksiController extends Controller
 {
@@ -21,14 +21,19 @@ class TransaksiController extends Controller
      * @return array
      */
     public function setPembelianAction() {
-        $dataPembelian = $this->request->getJsonRawBody();
+        try {
+            $dataPembelian = $this->request->getJsonRawBody();
 
-        if($data->pembelian->sifat_pembelian == SifatPembelian::tunai) {  //jurnal khusus pengeluaran kas
-            pembelianTunai($dataPembelian);
+            if($dataPembelian->sifat_pembelian == EnumSifatPembelian::tunai->value) {  //jurnal khusus pengeluaran kas
+                pembelianTunai($dataPembelian);
+            }
+            else if($dataPembelian->sifat_pembelian == EnumSifatPembelian::kredit->value) {  //jurnal khusus pembelian
+                //proses
+            }        
+        } catch (\Throwable $th) {
+            $pp = 2;
         }
-        else if($data->pembelian->sifat_pembelian == SifatPembelian::kredit) {  //jurnal khusus pembelian
-            //proses
-        }        
+        
     }
 
     /**

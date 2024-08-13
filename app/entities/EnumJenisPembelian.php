@@ -2,7 +2,7 @@
 
 namespace MyApp\Entities;
 
-enum JenisPembelian: int {
+enum EnumJenisPembelian: int {
     case perlengkapan = 1;
     case peralatan = 2;
     case bahan_baku = 3;

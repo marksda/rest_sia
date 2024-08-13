@@ -2,7 +2,7 @@
 
 namespace MyApp\Entities;
 
-enum SifatPembelian: int {
+enum EnumSifatPembelian: int {
     case tunai = 1;
     case kredit = 2;
 }
