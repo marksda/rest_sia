@@ -16,11 +16,11 @@ class NeracaLajurController extends Controller
     public function addAction()
     {
         $data = $this->request->getJsonRawBody();
-        $filterNeracaSaldo = new stdClass;
+        $filterNeracaSaldo = new \stdClass;
         $filterNeracaSaldo->perusahaan = $data->perusahaan;
         $filterNeracaSaldo->tanggal = $data->tanggal;
         
-        $filterJurnal = new stdClass;
+        $filterJurnal = new \stdClass;
         $filterJurnal->perusahaan = $data->perusahaan;
         $filterJurnal->tanggal = $data->tanggal;
         $filterJurnal->jenisJurnal = (object) array("id" => '06', "nama" => 'JURNAL PENYESUAIAN');

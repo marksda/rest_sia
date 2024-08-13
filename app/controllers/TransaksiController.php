@@ -25,7 +25,7 @@ class TransaksiController extends Controller
             $dataPembelian = $this->request->getJsonRawBody();
 
             if($dataPembelian->sifat_pembelian == EnumSifatPembelian::tunai->value) {  //jurnal khusus pengeluaran kas
-                pembelianTunai($dataPembelian);
+                $this->pembelianTunai($dataPembelian);
             }
             else if($dataPembelian->sifat_pembelian == EnumSifatPembelian::kredit->value) {  //jurnal khusus pembelian
                 //proses
@@ -44,21 +44,21 @@ class TransaksiController extends Controller
 	 */
     private function pembelianTunai($dataPembelian) {
 
-        $dataJurnal = new stdClass;
+        $dataJurnal = new \stdClass();
         $dataJurnal->id = null;
-        $jurnalData->keterangan = $dataPembelian->keterangan;
-        // $jurnalData->tanggal
-        // $jurnalData->jenis_jurnal
-        // $jurnalData->perusahaan->id
+        $dataJurnal->keterangan = $dataPembelian->keterangan;
+        // $dataJurnal->tanggal
+        // $dataJurnal->jenis_jurnal
+        $dataJurnal->perusahaan =  $dataPembelian->perusahaan;
         // $jurnalData->office_store_outlet->id
-        // $jurnalData->ref_bukti
+        $dataJurnal->ref_bukti = "213123";
         // $jurnalData->daftarItemJurnal;
         
         // $this->jurnalService->createJurnal($dataJurnal);
     }
 
-    private function pembelianKredit() {
+    // private function pembelianKredit() {
 
-    }
+    // }
 }
 
