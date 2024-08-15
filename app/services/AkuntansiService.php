@@ -196,6 +196,11 @@ class AkutansiService extends AbstractService
 
     /**
 	 * Creating a new jurnal penutup
+     * data sumber bisa berasal dari laporan laba rugi dan 
+     * laporan perubahan modal atau data sumber dari 
+     * neraca lajur.
+     * 
+     * dilakukan pada tanggal akhir priode akutansi
 	 *
 	 * @param json $idPerusahaan
      * @param int $periode 
