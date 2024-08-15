@@ -24,10 +24,10 @@ class TransaksiController extends Controller
         try {
             $dataPembelian = $this->request->getJsonRawBody();
 
-            if($dataPembelian->sifat_pembelian == EnumSifatPembelian::tunai->value) {  //jurnal khusus pengeluaran kas
+            if($dataPembelian->sifat_pembelian == EnumSifatPembelian::TUNAI->value) {  //jurnal khusus pengeluaran kas
                 $this->pembelianTunai($dataPembelian);
             }
-            else if($dataPembelian->sifat_pembelian == EnumSifatPembelian::kredit->value) {  //jurnal khusus pembelian
+            else if($dataPembelian->sifat_pembelian == EnumSifatPembelian::KREDIT->value) {  //jurnal khusus pembelian
                 //proses
             }        
         } catch (\Throwable $th) {
