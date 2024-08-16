@@ -48,10 +48,9 @@ class PerusahaanService extends AbstractService
 
 			$sqlFetchAkunTemplate = "
 				SELECT 
-					'" . $id . "' as perusahaan, header::int, level, nama, id as kode, kelompok_akun " .
-				"FROM 
-					public.tbl_akun_template
-				";
+					'" . $id . "' as perusahaan, header::int, level, nama, id as kode, jenis_akun, urutan " .
+				"FROM public.tbl_akun_template " .
+				"ORDER BY urutan ASC";
 
 			$rows = $this->db->fetchAll($sqlFetchAkunTemplate);	// menggunakan raw sql
 
@@ -63,7 +62,7 @@ class PerusahaanService extends AbstractService
 				}
 			}
 
-			$values = str_repeat('?,', 6) . '?';
+			$values = str_repeat('?,', 7) . '?';
 			$sqlInsertAkun = "INSERT INTO public.tbl_akun VALUES " .
 							str_repeat("($values),", count($rows) - 1) . "($values)"; 
 
@@ -231,7 +230,7 @@ class PerusahaanService extends AbstractService
 				throw new ServiceException('Unable to delete table partition', self::ERROR_UNABLE_DELETE_ITEM);
 			}
 
-			$sqlDropTablePartition = "DROP TABLE public.buku_besar".$perusahaanId." CASCADE";			
+			$sqlDropTablePartition = "DROP TABLE transaksi.buku_besar_".$perusahaanId." CASCADE";			
 			$success = $this->db->execute($sqlDropTablePartition);
 			if(false === $success) {
 				$this->db->rollback();
