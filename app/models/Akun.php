@@ -4,7 +4,7 @@ namespace MyApp\Models;
 
 use Phalcon\Mvc\Model;
 use MyApp\Models\Perusahaan;
-use MyApp\Models\KelompokAkun;
+use MyApp\Models\JenisAkun;
 
 class Akun extends Model
 {
@@ -14,7 +14,8 @@ class Akun extends Model
     protected $level;
     protected $nama;
     protected $kode;
-    protected $kelompok_akun;
+    protected $jenis_akun;
+    protected $urutan;
 
     public function initialize()
     {
@@ -30,12 +31,12 @@ class Akun extends Model
             ]
         );
         $this->hasOne(
-            'kelompok_akun',
-            KelompokAkun::class,
+            'jenis_akun',
+            JenisAkun::class,
             'id',
             [
                 'reusable' => false,
-                'alias'    => 'detail_kelompok_akun'
+                'alias'    => 'detail_jenis_akun'
             ]
         );
     }
@@ -163,9 +164,9 @@ class Akun extends Model
     /**
      * Get the value of jenis_akun
      */ 
-    public function getKelompok_akun()
+    public function getJenis_akun()
     {
-        return $this->kelompok_akun;
+        return $this->jenis_akun;
     }
 
     /**
@@ -173,9 +174,29 @@ class Akun extends Model
      *
      * @return  self
      */ 
-    public function setKelompok_akun($kelompok_akun)
+    public function setJenis_akun($jenis_akun)
     {
-        $this->kelompok_akun = $kelompok_akun;
+        $this->jenis_akun = $jenis_akun;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of urutan
+     */ 
+    public function getUrutan()
+    {
+        return $this->urutan;
+    }
+
+    /**
+     * Set the value of urutan
+     *
+     * @return  self
+     */ 
+    public function setUrutan($urutan)
+    {
+        $this->urutan = $urutan;
 
         return $this;
     }
