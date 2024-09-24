@@ -51,8 +51,7 @@ if (strtoupper($app->request->getMethod()) != 'OPTIONS') {
                 ->setHandler(TokenController::class, true)
                 ->setPrefix('/api/token')
                 ->post('/new', 'newAction')
-                ->put('/refresh', 'refreshAction')
-                ;
+                ->put('/refresh', 'refreshAction');
 
             $app->mount($userCollection);
 
